@@ -1,0 +1,10 @@
+import Login from "./login";
+import Register from "./register";
+import LogoutBtn from "./logoutbtn";
+import Footer from "./footer";
+import Header from "./header";
+import Container from "./container";
+import Upload from "./upload";
+import Scheduler from "./ScheduleSetup";
+import Pred from "./pred";
+export { Login, Register, LogoutBtn, Header, Footer, Container,Upload, Scheduler, Pred};

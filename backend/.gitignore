@@ -1,0 +1,19 @@
+
+# Environment files
+.env
+
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# WhatsApp session and cache
+.wwebjs_auth/
+.wwebjs_cache/
+ucs503p-202526odd-sankalp/
