@@ -9,10 +9,12 @@ import debugRouter from "./routes/debug.route.js";
 
 const app = express();
 
-app.use(cors({
-origin: "https://medic-reminder-two.vercel.app",
-credentials: true
-}));
+app.use(
+  cors({
+    origin: "https://care-sentry-ai.vercel.app",
+    credentials: true,
+  })
+);
 
 app.use(
   express.json({

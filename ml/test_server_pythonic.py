@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["https://medic-reminder-two.vercel.app", "https://medicreminder-ml.up.railway.app","https://medicreminder-production-0fb9.up.railway.app"]}}, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": ["https://care-sentry-ai.vercel.app/", "https://caresentryai-production-83aa.up.railway.app","https://caresentryai-production.up.railway.app"]}}, supports_credentials=True)
 
 github_api_key = os.getenv("GITHUB_API_KEY")
 

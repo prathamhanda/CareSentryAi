@@ -174,7 +174,7 @@ export default function Scheduler({ extracted = null }) {
           >
             To get Chat ID for Notifications, visit{" "}
             <a
-              href="http://t.me/MedicineReminderMeBot"
+              href="http://t.me/CareSentryAiBot"
               className="text-blue-400 hover:underline"
               target="_blank"
             >
