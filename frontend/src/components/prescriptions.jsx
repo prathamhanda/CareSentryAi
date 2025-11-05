@@ -24,20 +24,40 @@ export default function Prescriptions({ extracted }) {
       // Expect shape { status, message, data: [...] }
       const list = res?.data?.data || [];
       // Normalize medications to arrays
-      const normalized = (Array.isArray(list) ? list : []).map((p) => ({
-        id: p._id || p.id,
-        prescriptionNumber: p.prescriptionNumber || "Prescription",
-        patientName: p.patientName || "",
-        doctorName: p.doctorName || "",
-        dateIssued: p.dateIssued || p.createdAt,
-        diagnosis: p.diagnosis || "",
-        status: p.status || "Active",
-        medications: Array.isArray(p.medications)
+      const normalized = (Array.isArray(list) ? list : []).map((p) => {
+        const extractString = (v) => {
+          if (v === undefined || v === null) return "";
+          if (typeof v === "object") {
+            return v.name || v.patientName || v.patient || String(v);
+          }
+          return String(v);
+        };
+
+        const meds = Array.isArray(p.medications)
           ? p.medications
           : p.medications && typeof p.medications === "object"
           ? [p.medications]
-          : [],
-      }));
+          : [];
+
+        const normalizedMeds = meds.map((m) => ({
+          name: extractString(m.name || m.medicine),
+          dosage: extractString(m.dosage || m.dose),
+          frequency: extractString(m.frequency || m.freq),
+          duration: extractString(m.duration),
+          instructions: extractString(m.instructions || ""),
+        }));
+
+        return {
+          id: p._id || p.id,
+          prescriptionNumber: extractString(p.prescriptionNumber) || "Prescription",
+          patientName: extractString(p.patientName || p.patient || p.name),
+          doctorName: extractString(p.doctorName || p.doctor),
+          dateIssued: extractString(p.dateIssued || p.createdAt),
+          diagnosis: extractString(p.diagnosis || ""),
+          status: extractString(p.status || "Active"),
+          medications: normalizedMeds,
+        };
+      });
       setPrescriptions(normalized);
     } catch (err) {
       setError(

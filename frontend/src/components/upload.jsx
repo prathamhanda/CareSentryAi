@@ -401,13 +401,49 @@ export default function Upload({
               <>
                 <button
                   onClick={async () => {
-                    // Save prescription to backend
+                    // Save prescription to backend. Sanitize and normalize the
+                    // scanResults on the frontend to avoid sending nested
+                    // objects that the UI later tries to render as components.
                     try {
-                      await api.post("/prescriptions", scanResults);
+                      const sanitizeString = (v) => {
+                        if (v === undefined || v === null) return "";
+                        if (typeof v === "object") {
+                          // try to extract common name-like fields
+                          return (
+                            v.name || v.patientName || v.patient ||
+                            String(v)
+                          );
+                        }
+                        return String(v);
+                      };
+
+                      const sanitizeMedication = (m) => ({
+                        name: sanitizeString(m.name || m.medicine || m.med),
+                        dosage: sanitizeString(m.dosage || m.dose),
+                        frequency: sanitizeString(m.frequency || m.freq),
+                        duration: sanitizeString(m.duration),
+                        instructions: sanitizeString(m.instructions || ""),
+                      });
+
+                      const payload = {
+                        patientName: sanitizeString(scanResults?.patientName),
+                        doctorName: sanitizeString(scanResults?.doctorName),
+                        dateIssued: sanitizeString(scanResults?.dateIssued),
+                        diagnosis: sanitizeString(scanResults?.diagnosis),
+                        medications: Array.isArray(scanResults?.medications)
+                          ? scanResults.medications.map(sanitizeMedication)
+                          : typeof scanResults?.medications === "object" &&
+                            scanResults?.medications
+                          ? [sanitizeMedication(scanResults.medications)]
+                          : [],
+                      };
+
+                      await api.post("/prescriptions", payload);
                       // Optionally reset scan and navigate to prescriptions list
                       handleReset();
                       window.location.href = "/prescriptions";
                     } catch (err) {
+                      console.error("Save prescription failed:", err);
                       alert("Failed to save prescription");
                     }
                   }}
