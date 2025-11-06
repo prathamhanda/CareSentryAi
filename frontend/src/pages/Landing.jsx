@@ -27,7 +27,7 @@ export default function Landing() {
         <iframe
           width="100%"
           height="100%"
-          src="https://www.youtube.com/embed/CoUkLlziQEg"
+          src="https://www.youtube.com/embed/-8uc-ueX7JU"
           title="CareSentry AI Demo"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
