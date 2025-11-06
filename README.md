@@ -1,17 +1,16 @@
 # MedicReminder
 
-* **Deployed Link:** [life-aura.vercel.app](https://life-aura.vercel.app)
+* **Deployed Link:** [care-sentry.vercel.app](https://care-sentry-ai.vercel.app)
 
-LifeAura AI is an intelligent health management platform designed to assist users with **medication reminders**, **quick symptom guidance**, and **AI-powered analysis** for minor health issues. Built with a focus on accessibility and reliability, it serves as a digital health companion for individuals and caregivers alike.
+Caresentry AI is an intelligent health management platform designed to assist users with **medication reminders**, **quick symptom guidance**, and **AI-powered analysis** for minor health issues. Built with a focus on accessibility and reliability, it serves as a digital health companion for individuals and caregivers alike.
 
 ---
 
 ## Features
 * **MERN-based Web App** – Full-stack application with a modern, scalable architecture.
-* **Medication Scheduling & Reminders** – Automated WhatsApp/SMS notifications to prevent missed doses.
+* **Medication Scheduling & Reminders** – Automated Telegram notifications to prevent missed doses.
 * **Prescription Digitization** – OCR-based scanning for easy tracking of medications.
 * **AI Chatbot** – Symptom-checking assistant for instant health guidance.
-* **Skin Condition Analysis** – AI-driven image analysis for basic dermatological support.
 
 ---
 
@@ -29,7 +28,7 @@ LifeAura AI is an intelligent health management platform designed to assist user
 ---
 
 ## Security & Privacy
-LifeAura AI prioritizes data protection with:
+CareSentry AI prioritizes data protection with:
 * End-to-end encryption for sensitive health data
 * API calls secured with HTTPS & AES-256 encryption at rest
 * JWT-based authentication with role-based access control
@@ -48,7 +47,7 @@ LifeAura AI prioritizes data protection with:
 ## Project Roadmap
 1. Initial design & scope finalization
 2. Implement MERN stack setup with authentication & user profiles
-3. Integrate OCR, AI chatbot & skin image analysis
+3. Integrate OCR, AI Symptoms Predictor
 4. Deploy production-ready health companion platform
 
 ---

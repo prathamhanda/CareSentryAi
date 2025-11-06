@@ -11,7 +11,7 @@ export default function Landing() {
       <div className="flex items-center mb-6 animate-fadeIn">
         <Sparkles className="text-blue-400 w-8 h-8 mr-2" />
         <h1 className="text-4xl md:text-5xl font-bold text-blue-400 tracking-wide">
-          LifeAura AI
+          CareSentry AI
         </h1>
       </div>
 
@@ -28,7 +28,7 @@ export default function Landing() {
           width="100%"
           height="100%"
           src="https://www.youtube.com/embed/CoUkLlziQEg"
-          title="LifeAura AI Demo"
+          title="CareSentry AI Demo"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
