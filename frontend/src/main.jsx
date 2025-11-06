@@ -18,6 +18,7 @@ import PredictionPage from "./pages/Prediction.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import RedirectIfAuth from "./components/RedirectAuth.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import Landing from "./pages/Landing.jsx";
 
 const router = createBrowserRouter([
   {
@@ -32,7 +33,7 @@ const router = createBrowserRouter([
         index: true,
         element: (
           <RedirectIfAuth>
-            <LoginPage />
+            <Landing />
           </RedirectIfAuth>
         ),
       },
@@ -80,7 +81,7 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      { path: "*", element: <Navigate to="/login" replace /> },
+      { path: "*", element: <Navigate to="/" replace /> },
     ],
   },
 ]);

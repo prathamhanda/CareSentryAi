@@ -9,6 +9,9 @@ export default function Prescriptions({ extracted }) {
   const [selectedPrescription, setSelectedPrescription] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [editData, setEditData] = useState(null);
+
 
   // Handlers
   const handleSelectPrescription = (presc) => setSelectedPrescription(presc);
@@ -24,40 +27,20 @@ export default function Prescriptions({ extracted }) {
       // Expect shape { status, message, data: [...] }
       const list = res?.data?.data || [];
       // Normalize medications to arrays
-      const normalized = (Array.isArray(list) ? list : []).map((p) => {
-        const extractString = (v) => {
-          if (v === undefined || v === null) return "";
-          if (typeof v === "object") {
-            return v.name || v.patientName || v.patient || String(v);
-          }
-          return String(v);
-        };
-
-        const meds = Array.isArray(p.medications)
+      const normalized = (Array.isArray(list) ? list : []).map((p) => ({
+        id: p._id || p.id,
+        prescriptionNumber: p.prescriptionNumber || "Prescription",
+        patientName: p.patientName || "",
+        doctorName: p.doctorName || "",
+        dateIssued: p.dateIssued || p.createdAt,
+        diagnosis: p.diagnosis || "",
+        status: p.status || "Active",
+        medications: Array.isArray(p.medications)
           ? p.medications
           : p.medications && typeof p.medications === "object"
           ? [p.medications]
-          : [];
-
-        const normalizedMeds = meds.map((m) => ({
-          name: extractString(m.name || m.medicine),
-          dosage: extractString(m.dosage || m.dose),
-          frequency: extractString(m.frequency || m.freq),
-          duration: extractString(m.duration),
-          instructions: extractString(m.instructions || ""),
-        }));
-
-        return {
-          id: p._id || p.id,
-          prescriptionNumber: extractString(p.prescriptionNumber) || "Prescription",
-          patientName: extractString(p.patientName || p.patient || p.name),
-          doctorName: extractString(p.doctorName || p.doctor),
-          dateIssued: extractString(p.dateIssued || p.createdAt),
-          diagnosis: extractString(p.diagnosis || ""),
-          status: extractString(p.status || "Active"),
-          medications: normalizedMeds,
-        };
-      });
+          : [],
+      }));
       setPrescriptions(normalized);
     } catch (err) {
       setError(
@@ -69,6 +52,46 @@ export default function Prescriptions({ extracted }) {
       setLoading(false);
     }
   };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this prescription?")) return;
+    try {
+      await api.delete(`/prescriptions/${id}`);
+      setPrescriptions((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      alert(err?.response?.data?.message || "Failed to delete prescription");
+    }
+  };
+
+  const handleEdit = (prescription) => {
+    setEditingId(prescription.id);
+    setEditData(JSON.parse(JSON.stringify(prescription.medications))); // deep copy
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditData(null);
+  };
+
+  const handleSaveEdit = async (id) => {
+    try {
+      const res = await api.put(`/prescriptions/${id}`, { medications: editData });
+      let updated = res.data?.data;
+
+      if (updated && updated._id) updated.id = updated._id;
+
+      setPrescriptions((prev) =>
+        prev.map((p) => (p.id === id ? updated : p))
+      );
+
+      setEditingId(null);
+      setEditData(null);
+    } catch (err) {
+      alert(err?.response?.data?.message || "Failed to update prescription");
+    }
+  };
+
+
 
   useEffect(() => {
     fetchPrescriptions();
@@ -182,64 +205,6 @@ export default function Prescriptions({ extracted }) {
 
               {/* Prescription Content */}
               <div className="p-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Patient Information */}
-                  <div>
-                    <h4 className="text-lg font-medium text-gray-100 mb-4 flex items-center">
-                      <svg
-                        className="h-5 w-5 mr-2 text-blue-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        ></path>
-                      </svg>
-                      Patient Information
-                    </h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-300">Name:</span>
-                        <span className="text-gray-200">
-                          {prescription.patientName}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Doctor Information */}
-                  <div>
-                    <h4 className="text-lg font-medium text-gray-100 mb-4 flex items-center">
-                      <svg
-                        className="h-5 w-5 mr-2 text-green-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                        ></path>
-                      </svg>
-                      Doctor Information
-                    </h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-300">Doctor:</span>
-                        <span className="text-gray-200">
-                          {prescription.doctorName}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Medications */}
                 <div className="mt-6">
                   <h4 className="text-lg font-medium text-gray-100 mb-4 flex items-center">
@@ -259,128 +224,175 @@ export default function Prescriptions({ extracted }) {
                     Prescribed Medications
                   </h4>
                   <div className="space-y-4">
-                    {(prescription.medications || []).map(
-                      (medication, index) => (
-                        <div
-                          key={index}
-                          className="border border-gray-700 rounded-lg p-4 bg-gray-800 transition-colors"
-                        >
-                          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                            <div>
-                              <span className="font-medium text-gray-300 text-sm">
-                                Medicine:
-                              </span>
-                              <p className="text-gray-200 font-semibold">
-                                {medication.name}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="font-medium text-gray-300 text-sm">
-                                Dosage:
-                              </span>
-                              <p className="text-gray-200">{medication.dosage}</p>
-                            </div>
-                            <div>
-                              <span className="font-medium text-gray-300 text-sm">
-                                Frequency:
-                              </span>
-                              <p className="text-gray-200">
-                                {medication.frequency}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="font-medium text-gray-300 text-sm">
-                                Duration:
-                              </span>
-                              <p className="text-gray-200">
-                                {medication.duration}
-                              </p>
+                    {editingId === prescription.id
+                      ? editData.map((m, index) => (
+                          <div
+                            key={index}
+                            className="border border-gray-700 rounded-lg p-4 bg-gray-800 transition-colors space-y-2"
+                          >
+                            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                              <input
+                                type="text"
+                                className="border border-gray-600 bg-gray-900 text-gray-200 p-2 rounded"
+                                value={m.name}
+                                placeholder="Medicine name"
+                                onChange={(e) => {
+                                  const newData = [...editData];
+                                  newData[index].name = e.target.value;
+                                  setEditData(newData);
+                                }}
+                              />
+                              <input
+                                type="text"
+                                className="border border-gray-600 bg-gray-900 text-gray-200 p-2 rounded"
+                                value={m.dosage}
+                                placeholder="Dosage"
+                                onChange={(e) => {
+                                  const newData = [...editData];
+                                  newData[index].dosage = e.target.value;
+                                  setEditData(newData);
+                                }}
+                              />
+                              <input
+                                type="text"
+                                className="border border-gray-600 bg-gray-900 text-gray-200 p-2 rounded"
+                                value={m.frequency}
+                                placeholder="Frequency"
+                                onChange={(e) => {
+                                  const newData = [...editData];
+                                  newData[index].frequency = e.target.value;
+                                  setEditData(newData);
+                                }}
+                              />
+                              <input
+                                type="text"
+                                className="border border-gray-600 bg-gray-900 text-gray-200 p-2 rounded"
+                                value={m.duration}
+                                placeholder="Duration"
+                                onChange={(e) => {
+                                  const newData = [...editData];
+                                  newData[index].duration = e.target.value;
+                                  setEditData(newData);
+                                }}
+                              />
+                              <input
+                                type="text"
+                                className="border border-gray-600 bg-gray-900 text-gray-200 p-2 rounded"
+                                value={m.instructions}
+                                placeholder="Instructions"
+                                onChange={(e) => {
+                                  const newData = [...editData];
+                                  newData[index].instructions = e.target.value;
+                                  setEditData(newData);
+                                }}
+                              />
                             </div>
                           </div>
-                          {medication.instructions && (
-                            <div className="mt-3 pt-3 border-t border-gray-600">
-                              <span className="font-medium text-gray-300 text-sm">
-                                Instructions:
-                              </span>
-                              <p className="text-gray-400 italic">
-                                {medication.instructions}
-                              </p>
+                        ))
+                      : (prescription.medications || []).map((m, index) => (
+                          <div
+                            key={index}
+                            className="border border-gray-700 rounded-lg p-4 bg-gray-800 transition-colors"
+                          >
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                              <div>
+                                <span className="font-medium text-gray-300 text-sm">
+                                  Medicine:
+                                </span>
+                                <p className="text-gray-200 font-semibold">{m.name}</p>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-300 text-sm">
+                                  Dosage:
+                                </span>
+                                <p className="text-gray-200">{m.dosage}</p>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-300 text-sm">
+                                  Frequency:
+                                </span>
+                                <p className="text-gray-200">{m.frequency}</p>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-300 text-sm">
+                                  Duration:
+                                </span>
+                                <p className="text-gray-200">{m.duration}</p>
+                              </div>
                             </div>
-                          )}
-                        </div>
-                      )
-                    )}
+                            {m.instructions && (
+                              <div className="mt-3 pt-3 border-t border-gray-600">
+                                <span className="font-medium text-gray-300 text-sm">
+                                  Instructions:
+                                </span>
+                                <p className="text-gray-400 italic">{m.instructions}</p>
+                              </div>
+                            )}
+                          </div>
+                        ))}
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="mt-6 flex justify-end">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const prefill = {
-                        patientName: prescription.patientName,
-                        doctorName: prescription.doctorName,
-                        dateIssued: prescription.dateIssued,
-                        diagnosis: prescription.diagnosis,
-                        medications: prescription.medications,
-                      };
-                      navigate("/schedule", { state: { prefill } });
-                    }}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm"
-                  >
-                    Create Schedule
-                  </button>
+                <div className="mt-6 flex justify-end gap-3">
+                  {editingId === prescription.id ? (
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSaveEdit(prescription.id);
+                        }}
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCancelEdit();
+                        }}
+                        className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(prescription);
+                        }}
+                        className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(prescription.id);
+                        }}
+                        className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm"
+                      >
+                        Delete
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const prefill = { medications: prescription.medications };
+                          navigate("/schedule", { state: { prefill } });
+                        }}
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm"
+                      >
+                        Create Schedule
+                      </button>
+                    </>
+                  )}
+
                 </div>
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {selectedPrescription && (
-        <div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center p-4"
-          onClick={handleClearSelection}
-        >
-          <div
-            className="bg-gray-900 text-gray-100 rounded-lg shadow-lg max-w-lg w-full p-4 border border-gray-700"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-gray-100">
-                {selectedPrescription.prescriptionNumber || "Prescription"}
-              </h3>
-              <button
-                className="text-sm px-2 py-1 border border-gray-600 rounded text-gray-300 hover:bg-gray-700"
-                onClick={handleClearSelection}
-              >
-                Close
-              </button>
-            </div>
-            <div className="text-sm text-gray-300 space-y-2">
-              <div>
-                <b>Patient:</b> {selectedPrescription.patientName || "-"}
-              </div>
-              <div>
-                <b>Doctor:</b> {selectedPrescription.doctorName || "-"}
-              </div>
-              <div>
-                <b>Date:</b>{" "}
-                {formatDate(selectedPrescription.dateIssued) || "-"}
-              </div>
-              <div>
-                <b>Medications:</b>
-                <ul className="list-disc ml-5">
-                  {(selectedPrescription.medications || []).map((m, i) => (
-                    <li key={i}>
-                      {m.name} {m.dosage ? `- ${m.dosage}` : ""}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
       )}
     </div>

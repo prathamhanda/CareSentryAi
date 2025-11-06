@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Container, LogoutBtn } from "./index";
+import { Container } from "./index";
+import { Sparkles } from "lucide-react";
 
 export default function Header() {
   const navigate = useNavigate();
   const authStatus = useSelector((state) => state.auth.status);
   const [isDark, setIsDark] = useState(false);
 
+  // Initialize theme from localStorage or system preference
   useEffect(() => {
     const stored = localStorage.getItem("theme");
     const prefersDark =
@@ -27,7 +29,10 @@ export default function Header() {
 
   const navItems = [
     { name: "Home", path: "/" },
-    { name: "Prediction", path: "/prediction" },
+    {
+      name: "Prediction",
+      external: "https://diseasepred-a12r.onrender.com/",
+    },
     { name: "Login", path: "/login", auth: false },
     { name: "Register", path: "/register", auth: false },
     { name: "Upload", path: "/upload", auth: true },
@@ -36,17 +41,20 @@ export default function Header() {
   ];
 
   return (
-    <header className="py-4 shadow bg-white text-gray-900 dark:bg-gray-800 dark:text-white">
+    <header className="py-4 shadow bg-gray-900 text-gray-100 border-b border-gray-700">
       <Container>
+        {/* Logo / Title */}
         <div className="flex items-center justify-between">
-          <h1
-            className="text-2xl font-bold cursor-pointer mx-auto"
+          <div
+            className="flex items-center text-2xl font-bold cursor-pointer mx-auto text-blue-400"
             onClick={() => navigate("/")}
           >
-            CareSentry
-          </h1>
+            <Sparkles className="text-blue-400 w-8 h-8 mr-2" />
+            CareSentry AI
+          </div>
         </div>
 
+        {/* Navigation Bar */}
         <nav className="mt-3">
           <ul className="flex justify-center space-x-8">
             {navItems
@@ -57,14 +65,13 @@ export default function Header() {
                 <li key={item.name}>
                   <button
                     onClick={() => {
-                      if (item.name === "Prediction") {
-                        // 👇 open external ML app in a new tab
-                        window.open("https://diseasepred-a12r.onrender.com/", "_blank");
+                      if (item.external) {
+                        window.open(item.external, "_blank");
                       } else {
                         navigate(item.path);
                       }
                     }}
-                    className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    className="hover:text-blue-400 transition-colors"
                   >
                     {item.name}
                   </button>

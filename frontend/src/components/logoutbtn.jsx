@@ -1,19 +1,27 @@
 import React from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../store/authSlice";
+import api from "../api/axios.js";
+import { useAuth } from "../context/AuthContext.jsx";
+
 export default function LogoutBtn() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const logoutHandler = () => {
-    //logout functionality
-    dispatch(logout());
-    navigate("/");
+  const { setUser } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await api.post("/users/logout", {}, { withCredentials: true });
+      setUser(null); // 🧠 clear context
+      navigate("/login");
+    } catch (err) {
+      console.error("Logout failed:", err);
+      alert("Failed to logout. Try again.");
+    }
   };
+
   return (
     <button
-      className="inline-block px-6 py-2 duration-200 hover:bg-blue-100 rounded-full"
-      onClick={logoutHandler}
+      onClick={handleLogout}
+      className="inline-block px-6 py-2 duration-200 bg-red-600 hover:bg-red-700 rounded-full text-white"
     >
       Logout
     </button>

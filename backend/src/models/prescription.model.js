@@ -14,11 +14,6 @@ const MedicationSchema = new mongoose.Schema(
 const PrescriptionSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    prescriptionNumber: { type: String },
-    patientName: { type: String },
-    doctorName: { type: String },
-    dateIssued: { type: Date },
-    diagnosis: { type: String },
     medications: { type: [MedicationSchema], default: [] },
     status: {
       type: String,

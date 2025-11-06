@@ -29,6 +29,8 @@ export default function Upload({
     setResult("");
   };
 
+  const safeText = (val) => typeof val === "object" ? JSON.stringify(val) : val || "N/A";
+
   const handleDragOver = (event) => {
     event.preventDefault();
   };
@@ -292,58 +294,33 @@ export default function Upload({
 
               {/* Extracted Information */}
               <div className="space-y-2 text-xs">
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <span className="font-medium text-gray-100">Patient:</span>
-                    <p className="text-gray-800">{scanResults.patientName}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-100">Doctor:</span>
-                    <p className="text-gray-800">{scanResults.doctorName}</p>
-                  </div>
-                </div>
                 <div>
-                  <span className="font-medium text-gray-100">Date:</span>
-                  <p className="text-gray-800">{scanResults.dateIssued}</p>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-100">Diagnosis:</span>
-                  <p className="text-gray-800">{scanResults.diagnosis}</p>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-100">
-                    Medications:
-                  </span>
+                  <span className="font-medium text-gray-100">Medications:</span>
                   <ul className="text-gray-200 ml-2">
                     {(() => {
                       let meds = scanResults.medications;
                       if (Array.isArray(meds)) {
                         return meds.map((med, index) => (
                           <li key={index} className="text-xs">
-                            • {med.name} - {med.dosage}, {med.frequency},{" "}
-                            {med.duration}
+                            • {med.name} - {med.dosage}, {med.frequency}, {med.duration}
                           </li>
                         ));
                       } else if (typeof meds === "object" && meds !== null) {
-                        // If medications is a single object, render as one item
                         return (
                           <li className="text-xs">
-                            • {meds.name} - {meds.dosage}, {meds.frequency},{" "}
-                            {meds.duration}
+                            • {meds.name} - {meds.dosage}, {meds.frequency}, {meds.duration}
                           </li>
                         );
                       } else {
-                        // If medications is not present or not an array/object, show fallback
                         return (
-                          <li className="text-xs text-gray-400">
-                            No medications found
-                          </li>
+                          <li className="text-xs text-gray-400">No medications found</li>
                         );
                       }
                     })()}
                   </ul>
                 </div>
               </div>
+
             </div>
           )}
 
@@ -401,49 +378,13 @@ export default function Upload({
               <>
                 <button
                   onClick={async () => {
-                    // Save prescription to backend. Sanitize and normalize the
-                    // scanResults on the frontend to avoid sending nested
-                    // objects that the UI later tries to render as components.
+                    // Save prescription to backend
                     try {
-                      const sanitizeString = (v) => {
-                        if (v === undefined || v === null) return "";
-                        if (typeof v === "object") {
-                          // try to extract common name-like fields
-                          return (
-                            v.name || v.patientName || v.patient ||
-                            String(v)
-                          );
-                        }
-                        return String(v);
-                      };
-
-                      const sanitizeMedication = (m) => ({
-                        name: sanitizeString(m.name || m.medicine || m.med),
-                        dosage: sanitizeString(m.dosage || m.dose),
-                        frequency: sanitizeString(m.frequency || m.freq),
-                        duration: sanitizeString(m.duration),
-                        instructions: sanitizeString(m.instructions || ""),
-                      });
-
-                      const payload = {
-                        patientName: sanitizeString(scanResults?.patientName),
-                        doctorName: sanitizeString(scanResults?.doctorName),
-                        dateIssued: sanitizeString(scanResults?.dateIssued),
-                        diagnosis: sanitizeString(scanResults?.diagnosis),
-                        medications: Array.isArray(scanResults?.medications)
-                          ? scanResults.medications.map(sanitizeMedication)
-                          : typeof scanResults?.medications === "object" &&
-                            scanResults?.medications
-                          ? [sanitizeMedication(scanResults.medications)]
-                          : [],
-                      };
-
-                      await api.post("/prescriptions", payload);
+                      await api.post("/prescriptions", scanResults);
                       // Optionally reset scan and navigate to prescriptions list
                       handleReset();
                       window.location.href = "/prescriptions";
                     } catch (err) {
-                      console.error("Save prescription failed:", err);
                       alert("Failed to save prescription");
                     }
                   }}

@@ -87,20 +87,6 @@ export default function Scheduler({ extracted = null }) {
       return;
     }
 
-    // TODO: Integrate with your notification scheduler
-    // Expected data format for your scheduler:
-    // {
-    //   chatId: string,
-    //   medicines: [
-    //     {
-    //       name: string,
-    //       dosage: string,
-    //       time: string (HH:MM format),
-    //       duration: string (e.g., "7 days", "2 weeks")
-    //     }
-    //   ]
-    // }
-
     // Convert frontend form shape to backend expected shape:
     // { chatId, items: [ { medicine, times: [...], durationDays } ] }
     const parseDurationDays = (s) => {
@@ -180,7 +166,15 @@ export default function Scheduler({ extracted = null }) {
             >
               this bot
             </a>{" "}
-            and start the bot, then go to userinfobot and ask for your chat ID.
+            and start the bot, then go to{" "}
+            <a
+              href="http://t.me/userinfobot"
+              className="text-blue-400 hover:underline"
+              target="_blank"
+            >
+              userinfobot
+            </a>{" "}
+            and ask for your chat ID.
           </label>
           <div className="relative">
             <input
@@ -345,7 +339,7 @@ export default function Scheduler({ extracted = null }) {
         <div className="flex justify-end">
           <button
             onClick={handleCreateSchedule}
-            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors duration-200 flex items-center shadow-lg"
+            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors duration-200 flex items-center shadow-lg"
           >
             <svg
               className="h-5 w-5 mr-2"
