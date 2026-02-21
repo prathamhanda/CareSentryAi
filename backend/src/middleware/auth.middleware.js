@@ -7,7 +7,8 @@ const authenticate=async(req,res,next)=>{
     }
 
     try {
-        const user=jwt.verify(token,"sankalp");
+        const secret = process.env.ACCESS_TOKEN_SECRET || "sankalp";
+        const user=jwt.verify(token, secret);
         req.user=user;
         return next();
     } catch (err) {

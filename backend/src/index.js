@@ -13,12 +13,12 @@ console.log("CORS_ORIGIN:", process.env.CORS_ORIGIN);
 const port = process.env.PORT || 3000;
 
 connectDb()
-  .then(
+  .then(() => {
     app.listen(port, () => {
       console.log(`Listening at port ${port}`);
       telegramSetup();
-    })
-  )
+    });
+  })
   .catch((err) => {
     console.log(err);
   });

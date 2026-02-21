@@ -10,7 +10,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["https://care-sentry-ai.vercel.app", "https://caresentryai-production-83aa.up.railway.app","https://caresentryai-production.up.railway.app"]}}, supports_credentials=True)
+cors_origin_raw = os.getenv(
+    "CORS_ORIGIN",
+    "http://localhost:5173,https://care-sentry-ai.vercel.app",
+)
+origins = [o.strip() for o in cors_origin_raw.split(",") if o.strip()]
+CORS(app, resources={r"/*": {"origins": origins}})
 
 github_api_key = os.getenv("GITHUB_API_KEY")
 
@@ -64,5 +69,5 @@ def extract():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    port=5000
-    app.run(host='0.0.0.0',port=port)
+    port = int(os.environ.get("PORT", "5000"))
+    app.run(host='0.0.0.0', port=port)

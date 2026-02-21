@@ -9,9 +9,15 @@ import debugRouter from "./routes/debug.route.js";
 
 const app = express();
 
+const corsOriginRaw =
+  process.env.CORS_ORIGIN || "https://care-sentry-ai.vercel.app";
+const corsOrigin = corsOriginRaw.includes(",")
+  ? corsOriginRaw.split(",").map((s) => s.trim())
+  : corsOriginRaw;
+
 app.use(
   cors({
-    origin: "https://care-sentry-ai.vercel.app",
+    origin: corsOrigin,
     credentials: true,
   })
 );
@@ -36,6 +42,26 @@ app.use("/api", scheduleRouter);
 app.use("/api", prescriptionRouter);
 app.use("/api", predictRouter);
 app.use("/api/debug", debugRouter);
+
+// healthcheck (Render + external monitors)
+app.get("/health", (req, res) => {
+  return res.status(200).json({
+    ok: true,
+    service: "backend",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// convenient alias under /api as well
+app.get("/api/health", (req, res) => {
+  return res.status(200).json({
+    ok: true,
+    service: "backend",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
 
 app.get("/", (req, res) => {
   res.send("HOMEPAGE");

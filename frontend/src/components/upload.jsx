@@ -1,6 +1,10 @@
 import React, { useState, useRef } from "react";
 import api from "../api/axios.js";
 
+const OCR_BASE_URL = (import.meta.env.VITE_OCR_BASE_URL || "http://localhost:5000")
+  .toString()
+  .replace(/\/$/, "");
+
 // Uploads a prescription image to the ML server and maps the parsed output
 // Props:
 // - setExtracted: function(parsedObject) -> used by ScheduleSetup
@@ -64,7 +68,7 @@ export default function Upload({
       const form = new FormData();
       form.append("image", selectedFile);
 
-      const res = await fetch("https://caresentryai-production-83aa.up.railway.app/extract", {
+      const res = await fetch(`${OCR_BASE_URL}/extract`, {
         method: "POST",
         body: form,
       });

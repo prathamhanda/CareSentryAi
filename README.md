@@ -67,6 +67,7 @@ This setup is for the Python-based Machine Learning server.
 Create a file named **`.env`** inside the `./ml/` directory and add the following variable:
 
 * GITHUB_API_KEY=your_github_api_key_here
+* (optional) CORS_ORIGIN=http://localhost:5173,https://your-frontend.vercel.app
 
 ### 2. Install Dependencies
 Navigate to the ./ml/ directory and install the required Python packages:
@@ -92,6 +93,12 @@ Navigate to the ./frontend/ directory and install the required Node.js packages:
 ### 2. Run Server
 * npm run dev
 
+### 3. Environment Variables
+Create `./frontend/.env` (or set Vercel env vars) with:
+
+* VITE_API_BASE_URL=http://localhost:3000
+* VITE_OCR_BASE_URL=http://localhost:5000
+
 ---
 
 ## Backend Setup
@@ -102,7 +109,10 @@ Create a file named **`.env`** inside the `./backend/` directory and add the fol
 * PORT=3000
 * CORS_ORIGIN=http://localhost:5173
 * ACCESS_TOKEN_SECRET=your_long_secure_secret_here
-* ACCESS_TOKEN_EXPIRY=1h
+* ACCESS_TOKEN_EXPIRY=1d
+* MONGO_URI_ATLAS=your_mongodb_atlas_connection_string
+* TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+* DISEASE_MODEL_BASE=http://localhost:5001
 
 ### 2. Install Dependencies
 Navigate to the ./backend/ directory and install the required Node.js packages:
@@ -112,5 +122,27 @@ Navigate to the ./backend/ directory and install the required Node.js packages:
 
 ### 3. Run Server
 * npm run dev
+
+---
+
+## Disease Prediction Model Service (Optional, for /api/predict)
+The backend's `/api/predict` is a proxy and expects a separate model server exposing:
+
+* `GET /symptoms`
+* `POST /predict`
+
+This repo includes a deployable service under `./disease_model/`.
+
+### Environment Variables
+Create `./disease_model/.env` with:
+
+* MODEL_URL=https://drive.google.com/uc?export=download&id=... (your model pickle)
+* CORS_ORIGIN=http://localhost:5173,https://your-frontend.vercel.app
+
+Then run locally:
+
+* cd disease_model
+* pip install -r requirements.txt
+* python app.py
 
 ---
