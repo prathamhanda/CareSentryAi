@@ -1,6 +1,6 @@
 # MedicReminder
 
-* **Deployed Link:** [care-sentry.vercel.app](https://care-sentry-ai.vercel.app)
+* **Deployed Link:** [cai.pratham.codes/](https://cai.pratham.codes/)
 
 Caresentry AI is an intelligent health management platform designed to assist users with **medication reminders**, **quick symptom guidance**, and **AI-powered analysis** for minor health issues. Built with a focus on accessibility and reliability, it serves as a digital health companion for individuals and caregivers alike.
 
