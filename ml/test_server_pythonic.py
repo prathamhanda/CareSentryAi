@@ -133,6 +133,11 @@ def health():
     }
     if api_key_error:
         payload["api_key_error"] = str(api_key_error)[:800]
+        if "unauthorized" in str(api_key_error).lower() or "401" in str(api_key_error):
+            payload["hint"] = (
+                "Create a GitHub Personal Access Token with 'models:read' permission "
+                "and set it as GITHUB_TOKEN (preferred) or GITHUB_API_KEY on Render, then redeploy."
+            )
 
     return jsonify(payload), status_code
 
@@ -211,9 +216,18 @@ def extract():
     except Exception as e:
         print("[ocr] /extract failed:", str(e))
         traceback.print_exc()
+
+        detail = str(e)
+        if "unauthorized" in detail.lower() or "401" in detail:
+            return jsonify({
+                "error": "Unauthorized",
+                "hint": "Your GitHub token must have 'models:read' permission (GitHub Models). Update the Render env var and redeploy.",
+                "detail": detail,
+            }), 401
+
         return jsonify({
             "error": "OCR request failed",
-            "detail": str(e),
+            "detail": detail,
         }), 500
 
 if __name__ == '__main__':
