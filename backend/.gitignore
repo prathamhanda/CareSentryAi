@@ -17,3 +17,4 @@ Thumbs.db
 .wwebjs_auth/
 .wwebjs_cache/
 ucs503p-202526odd-sankalp/
+.env.example

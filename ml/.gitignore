@@ -1,2 +1,3 @@
 my_env
 .env
+.env.example
