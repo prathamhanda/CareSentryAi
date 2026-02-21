@@ -1,5 +1,5 @@
 import { Schedule } from "../models/schedule.model.js";
-import { startTelegramJob } from "../services/telegram.service.js";
+import { bot, startTelegramJob } from "../services/telegram.service.js";
 
 export const createTelegramSchedules = async (req, res) => {
   try {
@@ -11,6 +11,29 @@ export const createTelegramSchedules = async (req, res) => {
     if (!chatId) return res.status(400).json({ success: false, message: "chatId is required" });
     if (!Array.isArray(schedules) || schedules.length === 0)
       return res.status(400).json({ success: false, message: "schedules[] is required" });
+
+    if (!bot) {
+      return res.status(500).json({
+        success: false,
+        message: "Telegram bot is not configured on the server",
+        hint: "Set TELEGRAM_BOT_TOKEN and redeploy the backend.",
+      });
+    }
+
+    // Validate chatId upfront so we don't create schedules that can never send.
+    try {
+      await bot.sendMessage(
+        chatId,
+        "✅ CareSentry connected. Your medication reminders will be scheduled now."
+      );
+    } catch (e) {
+      return res.status(400).json({
+        success: false,
+        message: "Unable to send Telegram message to this chatId",
+        detail: String(e?.message || e),
+        hint: "Make sure you opened your bot in Telegram and pressed Start, then re-check your chatId.",
+      });
+    }
 
     const created = [];
     for (const s of schedules) {
@@ -37,6 +60,16 @@ export const createTelegramSchedules = async (req, res) => {
       });
 
       await startTelegramJob(doc);
+
+      // Optional: per-schedule confirmation to make debugging easy
+      try {
+        await bot.sendMessage(
+          chatId,
+          `⏰ Scheduled: ${medicine} at ${s.time} for ${duration} day(s).`
+        );
+      } catch {
+        // ignore; job will still run
+      }
       created.push(doc);
     }
     return res.json({ success: true, count: created.length, data: created });
