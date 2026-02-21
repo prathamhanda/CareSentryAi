@@ -1,3 +1,4 @@
 my_env
 .env
 .env.example
+.venv

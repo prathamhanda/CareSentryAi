@@ -20,6 +20,7 @@ export default function Upload({
   const [scanComplete, setScanComplete] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [scanResults, setScanResults] = useState(null);
+  const [scanError, setScanError] = useState("");
   const progressTimerRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -29,6 +30,7 @@ export default function Upload({
     setScanComplete(false);
     setScanProgress(0);
     setScanResults(null);
+    setScanError("");
     setExtracted(null);
     setResult("");
   };
@@ -46,6 +48,7 @@ export default function Upload({
     setScanComplete(false);
     setScanProgress(0);
     setScanResults(null);
+    setScanError("");
     setExtracted(null);
     setResult("");
   };
@@ -57,6 +60,7 @@ export default function Upload({
     setScanProgress(0);
     setScanComplete(false);
     setScanResults(null);
+    setScanError("");
 
     // Simulate progress while waiting on the ML API
     if (progressTimerRef.current) clearInterval(progressTimerRef.current);
@@ -72,7 +76,27 @@ export default function Upload({
         method: "POST",
         body: form,
       });
-      if (!res.ok) throw new Error(`ML server error (${res.status})`);
+
+      if (!res.ok) {
+        let message = `ML server error (${res.status})`;
+        try {
+          const contentType = res.headers.get("content-type") || "";
+          if (contentType.includes("application/json")) {
+            const body = await res.json();
+            const err = body?.error || body?.message;
+            const hint = body?.hint;
+            if (err && hint) message = `${err} (${res.status}) - ${hint}`;
+            else if (err) message = `${err} (${res.status})`;
+          } else {
+            const text = await res.text();
+            if (text) message = `${message} - ${text.slice(0, 800)}`;
+          }
+        } catch {
+          // ignore
+        }
+        throw new Error(message);
+      }
+
       const data = await res.json();
 
       // Raw result may be fenced with ```json ... ```; strip fences
@@ -117,6 +141,7 @@ export default function Upload({
       setScanComplete(true);
     } catch (error) {
       console.error("Scanning failed:", error);
+      setScanError(error?.message || "Scanning failed");
       setScanComplete(false);
       setScanResults(null);
     } finally {
@@ -139,6 +164,7 @@ export default function Upload({
     setScanComplete(false);
     setScanProgress(0);
     setScanResults(null);
+    setScanError("");
     // Clear parent-level outputs so new upload starts fresh
     setExtracted(null);
     setResult("");
@@ -199,13 +225,13 @@ export default function Upload({
                 type="file"
                 className="hidden"
                 onChange={handleFileSelect}
-                accept="image/*,.pdf"
+                accept="image/*"
                 ref={fileInputRef}
               />
             </label>
           </div>
           <p className="text-xs text-gray-500">
-            Support for images and PDF files
+            Support for image files
           </p>
         </div>
       ) : (
@@ -270,6 +296,30 @@ export default function Upload({
                   className="bg-purple-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${scanProgress}%` }}
                 ></div>
+              </div>
+            </div>
+          )}
+
+          {/* Scan Error */}
+          {!isScanning && !!scanError && (
+            <div className="bg-red-900 border border-red-700 rounded-lg p-4">
+              <div className="flex items-start">
+                <svg
+                  className="h-5 w-5 text-red-300 mr-2 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  ></path>
+                </svg>
+                <div className="text-sm text-red-100 break-words">
+                  {scanError}
+                </div>
               </div>
             </div>
           )}
