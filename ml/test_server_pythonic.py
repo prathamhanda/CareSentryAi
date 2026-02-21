@@ -33,6 +33,14 @@ def encode_image(image_path):
 def home():
     return "<h1>Hello, this is Flask Pythonic Backend responding</h1>"
 
+
+@app.route('/health', methods=["GET"])
+def health():
+    return jsonify({
+        "ok": True,
+        "service": "ocr",
+    }), 200
+
 @app.route('/extract', methods=['POST'])
 def extract():
     try:

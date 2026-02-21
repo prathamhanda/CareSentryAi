@@ -14,15 +14,24 @@ jobs:
     steps:
       - name: Validate configuration
         run: |
-          if [ -z "${{ secrets.RENDER_HEALTH_URL }}" ]; then
-            echo "Missing secret: RENDER_HEALTH_URL"
+          if [ -z "${{ secrets.RENDER_HEALTH_URLS }}" ]; then
+            echo "Missing secret: RENDER_HEALTH_URLS"
             exit 1
           fi
 
-      - name: Ping Render health endpoint
+      - name: Ping Render health endpoints
         run: |
           set -euo pipefail
-          url="${{ secrets.RENDER_HEALTH_URL }}"
-          echo "Pinging $url"
-          # Fail the job if the endpoint is not healthy
-          curl --fail --silent --show-error --max-time 20 "$url" | head -c 500
+          urls="${{ secrets.RENDER_HEALTH_URLS }}"
+          echo "Pinging configured endpoints..."
+
+          # Support newline-separated or comma-separated URLs.
+          echo "$urls" | tr ',' '\n' | while read -r url; do
+            url="$(echo "$url" | xargs)"
+            if [ -z "$url" ]; then
+              continue
+            fi
+            echo "- $url"
+            curl --fail --silent --show-error --max-time 20 "$url" | head -c 500
+            echo ""
+          done
