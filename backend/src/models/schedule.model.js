@@ -45,3 +45,17 @@ const scheduleSchema = new Schema(
 );
 
 export const Schedule = mongoose.model("Schedule", scheduleSchema);
+
+// ============================================
+// INDEXES FOR MONGODB EVALUATION
+// ============================================
+
+// Single field indexes
+scheduleSchema.index({ user: 1 });
+scheduleSchema.index({ chatId: 1 }); // For Telegram lookups
+scheduleSchema.index({ active: 1 }); // For finding active schedules
+
+// Compound indexes
+scheduleSchema.index({ user: 1, active: 1 }); // Find user's active schedules
+scheduleSchema.index({ user: 1, createdAt: -1 }); // Sort schedules by user and date
+scheduleSchema.index({ medicine: 1, active: 1 }); // Find schedules by medicine type

@@ -8,10 +8,12 @@ const userSchema=new mongoose.Schema({
         required: true,
         lowercase: true,
         unique: true,
+        index: true, // Single field index for faster lookups
     },
     email:{
         type: String,
         required: true,
+        index: true, // Index for email searches
     },
     phone:{
         type: String,
@@ -26,6 +28,16 @@ const userSchema=new mongoose.Schema({
         default: ""
     },
 },{timestamps: true});
+
+// ============================================
+// INDEXES FOR MONGODB EVALUATION
+// ============================================
+
+// Single field indexes for faster queries
+userSchema.index({ email: 1 });
+
+// Compound index: search by username and creation date
+userSchema.index({ username: 1, createdAt: -1 });
 
 userSchema.pre('save',async function(next){
     if(!this.isModified("password")){

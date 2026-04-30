@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
 
 const OCR_BASE_URL = (import.meta.env.VITE_OCR_BASE_URL || "http://localhost:5000")
@@ -15,6 +16,7 @@ export default function Upload({
   result,
   setResult = () => {},
 }) {
+  const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [scanComplete, setScanComplete] = useState(false);
@@ -374,7 +376,37 @@ export default function Upload({
                   </ul>
                 </div>
               </div>
-
+  {/* Related Features */}
+              <div className="border-t border-green-700 pt-3 mt-3">
+                <p className="text-xs text-green-200 mb-2 font-semibold">Explore related features:</p>
+                <div className="flex flex-wrap gap-2">
+                  <a
+                    href="/analytics"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded transition-colors inline-block"
+                  >
+                    View Analytics
+                  </a>
+                  <a
+                    href="/advanced-search"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded transition-colors inline-block"
+                  >
+                    Search Similar
+                  </a>
+                  <a
+                    href="/data-insights"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded transition-colors inline-block"
+                  >
+                    View Insights
+                  </a>
+                </div>
+              </div>
+            
             </div>
           )}
 

@@ -15,6 +15,9 @@ import Prescription from "./pages/Prescription.jsx";
 import PrescriptionsPage from "./pages/Prescriptions.jsx";
 import SchedulePage from "./pages/Schedule.jsx";
 import PredictionPage from "./pages/Prediction.jsx";
+import Analytics from "./pages/Analytics.jsx";
+import AdvancedSearchPage from "./pages/AdvancedSearch.jsx";
+import DataInsights from "./pages/DataInsights.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import RedirectIfAuth from "./components/RedirectAuth.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
@@ -78,6 +81,30 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <PrescriptionsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "analytics",
+        element: (
+          <ProtectedRoute>
+            <Analytics />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "advanced-search",
+        element: (
+          <ProtectedRoute>
+            <AdvancedSearchPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "data-insights",
+        element: (
+          <ProtectedRoute>
+            <DataInsights />
           </ProtectedRoute>
         ),
       },

@@ -38,6 +38,9 @@ export default function Header() {
     { name: "Upload", path: "/upload", auth: true },
     { name: "Prescriptions", path: "/prescriptions", auth: true },
     { name: "Create Schedule", path: "/schedule", auth: true },
+    { name: "Analytics", path: "/analytics", auth: true },
+    { name: "Search", path: "/advanced-search", auth: true },
+    { name: "Insights", path: "/data-insights", auth: true },
   ];
 
   return (

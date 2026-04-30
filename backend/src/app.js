@@ -6,6 +6,8 @@ import scheduleRouter from "./routes/schedule.route.js";
 import prescriptionRouter from "./routes/prescription.route.js";
 import predictRouter from "./routes/predict.route.js";
 import debugRouter from "./routes/debug.route.js";
+import aggregationRouter from "./routes/aggregation.route.js";
+import advancedQueriesRouter from "./routes/advanced-queries.route.js";
 
 const app = express();
 
@@ -42,6 +44,8 @@ app.use("/api", scheduleRouter);
 app.use("/api", prescriptionRouter);
 app.use("/api", predictRouter);
 app.use("/api/debug", debugRouter);
+app.use("/api/aggregation", aggregationRouter); // Aggregation Framework routes
+app.use("/api/queries", advancedQueriesRouter); // Advanced Query operations routes
 
 // healthcheck (Render + external monitors)
 app.get("/health", (req, res) => {

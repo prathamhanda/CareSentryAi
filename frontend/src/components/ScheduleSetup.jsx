@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
 
 export default function Scheduler({ extracted = null }) {
+  const navigate = useNavigate();
   const [chatId, setChatId] = useState("");
   const [medicines, setMedicines] = useState([
     {
@@ -357,6 +359,42 @@ export default function Scheduler({ extracted = null }) {
             Create Schedule
           </button>
         </div>
+
+      {/* Related Features Section */}
+      <div className="mt-8 bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 rounded-lg p-6">
+        <h3 className="text-lg font-bold text-gray-100 mb-4 flex items-center">
+          <svg className="w-5 h-5 mr-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Explore related MongoDB features
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <a
+            href="/advanced-search"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-gray-900 border border-gray-600 hover:border-purple-500 hover:bg-gray-800 rounded-lg p-4 text-left transition-all duration-200 group"
+          >
+            <p className="text-purple-400 font-semibold group-hover:text-purple-300 flex items-center">
+              Check Active Schedules
+              <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+            </p>
+            <p className="text-gray-400 text-sm mt-1">View all active medication schedules</p>
+          </a>
+          <a
+            href="/analytics"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-gray-900 border border-gray-600 hover:border-blue-500 hover:bg-gray-800 rounded-lg p-4 text-left transition-all duration-200 group"
+          >
+            <p className="text-blue-400 font-semibold group-hover:text-blue-300 flex items-center">
+              View Schedule Analytics
+              <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+            </p>
+            <p className="text-gray-400 text-sm mt-1">Analyze medication patterns and statistics</p>
+          </a>
+        </div>
+      </div>
       </div>
     </div>
   );
