@@ -2,7 +2,7 @@
 
 # 🩺 CareSentry AI
 
-<a href="https://cai.pratham.codes/">
+<a href="https://cs.prathamh.com/">
 	<img src="https://img.shields.io/badge/CareSentry%20AI-Digital%20Health%20Companion-6366f1?style=for-the-badge" alt="CareSentry AI" />
 </a>
 
@@ -26,7 +26,7 @@
 
 CareSentry AI is an intelligent health management platform designed to assist users with **medication reminders**, **quick symptom guidance**, and **AI-powered analysis** for minor health issues. Built with a focus on accessibility and reliability, it serves as a digital health companion for individuals and caregivers alike.
 
-**Deployed Link:** https://cai.pratham.codes/
+**Deployed Link:** https://cs.prathamh.com/
 
 ---
 
