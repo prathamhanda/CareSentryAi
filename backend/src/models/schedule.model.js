@@ -6,7 +6,7 @@ const scheduleSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: false, // optional now
+      required: false, 
     },
     chatId: {
       type: String,

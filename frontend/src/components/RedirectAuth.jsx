@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext.jsx'
+import { useAuth } from '../context/useAuth.jsx'
 
 export default function RedirectIfAuth({children}){
   const { user, loading } = useAuth()
@@ -7,5 +7,4 @@ export default function RedirectIfAuth({children}){
   if(user) return <Navigate to="/upload" replace />
   return children
 }
-
 

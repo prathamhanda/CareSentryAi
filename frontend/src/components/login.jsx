@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/useAuth.jsx";
+import { User, Lock, ArrowRight, ShieldCheck, AlertCircle, Scan, Bell, CheckCircle2 } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -24,172 +25,169 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (!formData.username || !formData.password) return;
+    if (!formData.username.trim() || !formData.password) return;
     try {
       setSubmitting(true);
       const res = await api.post("/users/login", formData);
       const data = res?.data || {};
       if (data.status === 200 && data.user) {
-        // Set authenticated user in context; cookie is set by server (httpOnly)
+        if (data.token) {
+          localStorage.setItem("accessToken", data.token);
+        }
         setUser(data.user);
         navigate("/upload", { replace: true });
       } else {
-        setError(data.message || "Login failed. Please try again.");
+        setError(data.message || "Invalid credentials. Please verify your login details.");
       }
     } catch (err) {
-      setError(err?.response?.data?.message || err?.message || "Login failed");
+      setError(err?.response?.data?.message || err?.message || "Authentication failed.");
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      {/* Dialog Box Container */}
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto transform transition-all duration-300 ease-in-out">
-        {/* Header */}
-        <div className="px-8 pt-8 pb-6">
-          <div className="text-center">
-            
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Welcome Back
-            </h2>
-            <p className="text-gray-600 text-sm">
-              Please sign in to your account
+    <div className="min-h-[calc(100vh-160px)] flex items-center justify-center py-10 px-4 sm:px-6">
+      <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        {/* Left Column: Visual Companion Showcase (5 Cols) */}
+        <div className="hidden lg:flex lg:col-span-5 flex-col justify-between p-8 rounded-[12px] bg-[#ffffff] border border-[rgba(0,0,0,0.08)] shadow-sm space-y-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#e8f8ff] rounded-full text-xs font-semibold text-[#244cff] mb-4">
+              <span className="w-2 h-2 rounded-full bg-[#244cff]" />
+              <span>CareSentry</span>
+            </div>
+            <h3 className="font-['Inter'] text-2xl font-normal text-[#000000] tracking-tight">
+              Never miss a dose
+            </h3>
+            <p className="font-['Inter'] text-xs text-[#2b2b2b] mt-2 leading-relaxed">
+              Scan your prescriptions, organize your medication times, and get friendly reminders sent to Telegram.
             </p>
+          </div>
+
+          <div className="w-full flex justify-center py-2 animate-float-slow">
+            <img
+              src="/assets/illustrations/auth-companion.svg"
+              alt="CareSentry Companion"
+              className="w-48 h-auto drop-shadow-md"
+            />
+          </div>
+
+          <div className="space-y-2.5 pt-4 border-t border-[rgba(0,0,0,0.06)] text-xs text-[#2b2b2b]">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#00c978]" />
+              <span>Scan handwritten or printed prescriptions</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#00c978]" />
+              <span>Daily reminder alerts sent to Telegram</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#00c978]" />
+              <span>Review your schedule before saving</span>
+            </div>
           </div>
         </div>
 
-        {/* Form */}
-        <div className="px-8 pb-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="username"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Username
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    required
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
-                    placeholder="Enter your username"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
-                    placeholder="Enter your password"
-                  />
-                </div>
-              </div>
+        {/* Right Column: Authentication Card (7 Cols) */}
+        <div className="lg:col-span-7 card-snow bg-clinical-pattern p-8 sm:p-10 space-y-6 shadow-sm">
+          {/* Header */}
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#e8f8ff] rounded-full text-xs font-semibold text-[#244cff] mb-1">
+              <span className="w-2 h-2 rounded-full bg-[#244cff]" />
+              <span>Sign In</span>
             </div>
-            {/*
-            Additional Options
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="ml-2 text-gray-600">Remember me</span>
+            <h2 className="font-['Inter'] text-2xl sm:text-3xl font-normal text-[#000000] tracking-tight">
+              Welcome Back
+            </h2>
+            <p className="font-['Inter'] text-sm text-[#2b2b2b]">
+              Sign in to view your prescriptions and reminder schedules.
+            </p>
+          </div>
+
+          {/* Error Alert */}
+          {error && (
+            <div className="p-3.5 rounded-[6px] bg-[#fcc2cd]/20 border border-[#fcc2cd] text-[#ff2b3a] text-xs flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-[#ff2b3a] shrink-0 mt-0.5" />
+              <span className="font-medium text-[#000000]">{error}</span>
+            </div>
+          )}
+
+          {/* Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label
+                htmlFor="username"
+                className="block text-xs font-semibold text-[#000000] mb-1.5"
+              >
+                Username
               </label>
-              <a
-                href="#"
-                className="text-blue-600 hover:text-blue-800 font-medium"
-              >
-                Forgot password?
-              </a>
-            </div>
-            */}
-            {/* Submit Button */}
-            {error && (
-              <p className="text-red-600 text-sm" role="alert">
-                {error}
-              </p>
-            )}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg"
-            >
-              {submitting ? "Signing In..." : "Sign In"}
-            </button>
-
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Don't have an account?
-                </span>
+              <div className="relative">
+                <User className="w-4 h-4 text-[#878787] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter your username"
+                  className="input-mage has-left-icon pl-11"
+                />
               </div>
             </div>
 
-            {/* Register Link */}
-            <div className="text-center">
-              <Link
-                to="/register"
-                className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-xs font-semibold text-[#000000] mb-1.5"
               >
-                Create a new account
-              </Link>
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-[#878787] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="••••••••••••"
+                  className="input-mage has-left-icon pl-11"
+                />
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full btn-cobalt disabled:opacity-50 interactive-pill"
+                style={{ height: "42px" }}
+              >
+                <span>{submitting ? "Authenticating..." : "Sign In to Account"}</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </button>
             </div>
           </form>
+
+          {/* Footer Link & Security Notice */}
+          <div className="pt-4 border-t border-[rgba(0,0,0,0.08)] text-center text-xs text-[#878787] space-y-3">
+            <p>
+              Don't have an account yet?{" "}
+              <Link
+                to="/register"
+                className="font-medium text-[#244cff] hover:underline"
+              >
+                Create free account
+              </Link>
+            </p>
+
+            <p className="flex items-center justify-center gap-1.5 text-[11px] text-[#878787] pt-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#00c978]" />
+              <span>Your health information is kept private and secure</span>
+            </p>
+          </div>
         </div>
       </div>
     </div>

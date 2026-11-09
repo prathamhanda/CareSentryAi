@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 360" fill="none" class="medication-routine-illustration">
+  <defs>
+    <linearGradient id="circadianArc" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fced9f"/>
+      <stop offset="35%" stop-color="#244cff"/>
+      <stop offset="70%" stop-color="#c3aeff"/>
+      <stop offset="100%" stop-color="#1d1f21"/>
+    </linearGradient>
+    <linearGradient id="blisterFoil" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#e8f8ff"/>
+      <stop offset="100%" stop-color="#d6f2ff"/>
+    </linearGradient>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="dropShadow" x="-10%" y="-10%" width="125%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#1d1f21" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Circadian Daily Arc Path -->
+  <path d="M 50 280 A 180 140 0 0 1 410 280" stroke="url(#circadianArc)" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M 50 280 A 180 140 0 0 1 410 280" stroke="#ffffff" stroke-width="2" stroke-dasharray="3 8" fill="none"/>
+
+  <!-- Morning Sunrise Station (08:00) -->
+  <g class="routine-sun" transform="translate(90, 180)">
+    <circle cx="0" cy="0" r="20" fill="#fced9f" filter="url(#dropShadow)"/>
+    <circle cx="0" cy="0" r="12" fill="#ffb800"/>
+    <g stroke="#ffb800" stroke-width="2" stroke-linecap="round">
+      <line x1="0" y1="-16" x2="0" y2="-22"/>
+      <line x1="0" y1="16" x2="0" y2="22"/>
+      <line x1="-16" y1="0" x2="-22" y2="0"/>
+      <line x1="16" y1="0" x2="22" y2="0"/>
+    </g>
+    <!-- Label -->
+    <rect x="-26" y="26" width="52" height="18" rx="9" fill="#1d1f21"/>
+    <text x="0" y="38" text-anchor="middle" font-family="'Inter', sans-serif" font-weight="700" font-size="9.5" fill="#fced9f">08:00 AM</text>
+  </g>
+
+  <!-- High Noon Daylight Station (12:00) -->
+  <g class="routine-noon" transform="translate(230, 140)">
+    <circle cx="0" cy="0" r="24" fill="#244cff" filter="url(#dropShadow)"/>
+    <!-- Pill Symbol inside Noon -->
+    <rect x="-10" y="-5" width="20" height="10" rx="5" fill="#ffffff"/>
+    <path d="M 0 -5 L 5 -5 A 5 5 0 0 1 10 0 A 5 5 0 0 1 5 5 L 0 5 Z" fill="#00c978"/>
+    <!-- Label -->
+    <rect x="-26" y="30" width="52" height="18" rx="9" fill="#244cff"/>
+    <text x="0" y="42" text-anchor="middle" font-family="'Inter', sans-serif" font-weight="700" font-size="9.5" fill="#ffffff">12:00 PM</text>
+  </g>
+
+  <!-- Evening Dusk Station (18:00) -->
+  <g class="routine-dusk" transform="translate(340, 195)">
+    <circle cx="0" cy="0" r="19" fill="#c3aeff" filter="url(#dropShadow)"/>
+    <!-- Crescent Moon inside Dusk -->
+    <path d="M -4 -8 A 10 10 0 0 0 6 7 A 12 12 0 1 1 -4 -8 Z" fill="#1d1f21"/>
+    <!-- Label -->
+    <rect x="-26" y="25" width="52" height="18" rx="9" fill="#1d1f21"/>
+    <text x="0" y="37" text-anchor="middle" font-family="'Inter', sans-serif" font-weight="700" font-size="9.5" fill="#c3aeff">18:00 PM</text>
+  </g>
+
+  <!-- Center Stage: Blister Pack & Glass of Water -->
+  <g id="blister-pack-card" transform="translate(145, 175) rotate(-6)" filter="url(#dropShadow)">
+    <rect x="0" y="0" width="150" height="100" rx="10" fill="url(#blisterFoil)" stroke="rgba(0,0,0,0.1)" stroke-width="1.2"/>
+    <!-- Blister Pocket 1 (Filled) -->
+    <circle cx="35" cy="32" r="14" fill="#ffffff" stroke="#244cff" stroke-width="1.5"/>
+    <rect x="25" y="27" width="20" height="10" rx="5" fill="#244cff"/>
+    <!-- Blister Pocket 2 (Taken/Empty outline) -->
+    <circle cx="75" cy="32" r="14" fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <path d="M 70 32 L 73 35 L 81 27" stroke="#00c978" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Blister Pocket 3 -->
+    <circle cx="115" cy="32" r="14" fill="#ffffff" stroke="#c3aeff" stroke-width="1.5"/>
+    <rect x="105" y="27" width="20" height="10" rx="5" fill="#c3aeff"/>
+    <!-- Blister Pocket 4 -->
+    <circle cx="35" cy="70" r="14" fill="#ffffff" stroke="#244cff" stroke-width="1.5"/>
+    <rect x="25" y="65" width="20" height="10" rx="5" fill="#244cff"/>
+    <!-- Blister Pocket 5 -->
+    <circle cx="75" cy="70" r="14" fill="#ffffff" stroke="#1d1f21" stroke-width="1.5"/>
+    <rect x="65" y="65" width="20" height="10" rx="5" fill="#1d1f21"/>
+    <!-- Blister Pocket 6 -->
+    <circle cx="115" cy="70" r="14" fill="#ffffff" stroke="#fced9f" stroke-width="1.5"/>
+    <rect x="105" y="65" width="20" height="10" rx="5" fill="#ffb800"/>
+  </g>
+
+  <!-- Telegram Push Automation Capsule -->
+  <g class="routine-telegram-chip" transform="translate(160, 290)" filter="url(#dropShadow)">
+    <rect x="0" y="0" width="150" height="34" rx="17" fill="#ffffff" stroke="#244cff" stroke-width="1.5"/>
+    <circle cx="17" cy="17" r="10" fill="#244cff"/>
+    <!-- Paper Plane Icon -->
+    <path d="M 13 17 L 21 13 L 18 20 L 16 18 Z" fill="#ffffff"/>
+    <text x="35" y="21" font-family="'Inter', sans-serif" font-weight="600" font-size="10.5" fill="#1d1f21">Daily Reminders</text>
+    <circle cx="136" cy="17" r="3" fill="#00c978"/>
+  </g>
+</svg>

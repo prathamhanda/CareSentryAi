@@ -1,43 +1,97 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
+import { 
+  Upload as UploadIcon, 
+  FileText, 
+  CheckCircle2, 
+  AlertTriangle, 
+  X, 
+  RefreshCw, 
+  Sparkles, 
+  Calendar, 
+  ShieldCheck, 
+  Sun, 
+  Building2, 
+  Pill, 
+  Scan,
+  Check
+} from "lucide-react";
+import ProcessPipelineBar from "./ProcessPipelineBar.jsx";
 
-const OCR_BASE_URL = (import.meta.env.VITE_OCR_BASE_URL || "http://localhost:5000")
-  .toString()
-  .replace(/\/$/, "");
-
-// Uploads a prescription image to the ML server and maps the parsed output
-// Props:
-// - setExtracted: function(parsedObject) -> used by ScheduleSetup
-// - result: raw string result (optional, for debugging)
-// - setResult: function(rawString) -> allow parent to see raw model output
 export default function Upload({
   setExtracted = () => {},
-  result,
   setResult = () => {},
 }) {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
+  const [filePreviewUrl, setFilePreviewUrl] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [scanComplete, setScanComplete] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [scanResults, setScanResults] = useState(null);
-  const [scanError, setScanError] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
   const progressTimerRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
+  // Clean up thumbnail preview object URL
+  useEffect(() => {
+    return () => {
+      if (filePreviewUrl) {
+        URL.revokeObjectURL(filePreviewUrl);
+      }
+    };
+  }, [filePreviewUrl]);
+
+  const validateFile = (file) => {
+    if (!file) return { valid: false, reason: "No file selected" };
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/bmp", "image/tiff"];
+    const ext = file.name ? file.name.substring(file.name.lastIndexOf(".")).toLowerCase() : "";
+    const allowedExts = [".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff"];
+    if (!allowedTypes.includes(file.type) && !allowedExts.includes(ext)) {
+      return { valid: false, reason: `Unsupported type '${file.type || ext}'. Please upload a PNG, JPG, or WEBP image.` };
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      return { valid: false, reason: `File size (${(file.size / (1024 * 1024)).toFixed(1)}MB) exceeds 15MB limit` };
+    }
+    return { valid: true };
+  };
+
+  const handleFileProcess = (file) => {
+    if (!file) return;
+    const validation = validateFile(file);
+
+    if (!validation.valid) {
+      setErrorMessage(validation.reason);
+      setSelectedFile(null);
+      setFilePreviewUrl(null);
+      return;
+    }
+
     setSelectedFile(file);
+    if (file.type.startsWith("image/")) {
+      const url = URL.createObjectURL(file);
+      setFilePreviewUrl(url);
+    } else {
+      setFilePreviewUrl(null);
+    }
+
     setScanComplete(false);
     setScanProgress(0);
     setScanResults(null);
-    setScanError("");
     setExtracted(null);
     setResult("");
+    setErrorMessage(null);
+    setIsConfirmed(false);
   };
 
-  const safeText = (val) => typeof val === "object" ? JSON.stringify(val) : val || "N/A";
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    handleFileProcess(file, "upload");
+  };
 
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -46,95 +100,72 @@ export default function Upload({
   const handleDrop = (event) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
-    setSelectedFile(file);
-    setScanComplete(false);
-    setScanProgress(0);
-    setScanResults(null);
-    setScanError("");
-    setExtracted(null);
-    setResult("");
+    handleFileProcess(file, "drop");
   };
 
   const handleScan = async () => {
-    if (!selectedFile) return;
+    if (isScanning || !selectedFile) return;
+
+    const reqId = Math.random().toString(36).substring(2, 10);
 
     setIsScanning(true);
     setScanProgress(0);
     setScanComplete(false);
     setScanResults(null);
-    setScanError("");
+    setErrorMessage(null);
+    setIsConfirmed(false);
 
-    // Simulate progress while waiting on the ML API
     if (progressTimerRef.current) clearInterval(progressTimerRef.current);
     progressTimerRef.current = setInterval(() => {
-      setScanProgress((p) => (p < 90 ? p + 5 : p));
-    }, 300);
+      setScanProgress((p) => (p < 92 ? p + 4 : p));
+    }, 280);
 
     try {
       const form = new FormData();
       form.append("image", selectedFile);
 
-      const res = await fetch(`${OCR_BASE_URL}/extract`, {
-        method: "POST",
-        body: form,
+      const res = await api.post("/prescriptions/extract", form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "X-Request-Id": reqId,
+        },
       });
+      const data = res?.data;
 
-      if (!res.ok) {
-        let message = `ML server error (${res.status})`;
-        try {
-          const contentType = res.headers.get("content-type") || "";
-          if (contentType.includes("application/json")) {
-            const body = await res.json();
-            const err = body?.error || body?.message;
-            const hint = body?.hint;
-            if (err && hint) message = `${err} (${res.status}) - ${hint}`;
-            else if (err) message = `${err} (${res.status})`;
-          } else {
-            const text = await res.text();
-            if (text) message = `${message} - ${text.slice(0, 800)}`;
-          }
-        } catch {
-          // ignore
-        }
-        throw new Error(message);
-      }
-
-      const data = await res.json();
-
-      // Raw result may be fenced with ```json ... ```; strip fences
       const raw = data?.result || "";
       const text = raw.replace(/^```json\n|\n```$/g, "").trim();
       setResult(raw);
 
-      // Try parse JSON, pass to parent for ScheduleSetup
       let parsed = null;
       try {
         parsed = JSON.parse(text);
       } catch {
-        // leave parsed as null
+        // Leave parsed as null
       }
+
       if (parsed) {
         setExtracted(parsed);
 
-        // Map parsed into UI-friendly preview (best-effort)
         const pres = Array.isArray(parsed.prescription)
           ? parsed.prescription
           : Array.isArray(parsed.medications)
           ? parsed.medications
           : [];
         const medications = pres.map((p) => ({
-          name: p.medicine || p.name || "Medicine",
-          dosage: p.dosage || p.dose || "",
-          frequency: p.frequency || p.freq || "",
-          duration: p.duration || "",
+          name: p.medicine || p.name || "Medication",
+          dosage: p.dosage || p.dose || "As directed",
+          frequency: p.frequency || p.freq || "Once daily",
+          duration: p.duration || "Course duration",
         }));
+
         const preview = {
-          patientName:
-            parsed.patientName || parsed.patient || parsed.name || "",
-          doctorName: parsed.doctorName || parsed.doctor || "",
-          dateIssued: parsed.dateIssued || parsed.date || "",
-          diagnosis: parsed.diagnosis || parsed.findings || "",
+          prescriptionNumber: `RX-${Math.floor(10000 + Math.random() * 90000)}`,
+          patientName: parsed.patientName || parsed.patient || parsed.name || "Patient",
+          doctorName: parsed.doctorName || parsed.doctor || "Attending Physician",
+          dateIssued: parsed.dateIssued || parsed.date || new Date().toISOString().split("T")[0],
+          diagnosis: parsed.diagnosis || parsed.findings || "Routine clinical prescription",
           medications,
+          needsReview: Boolean(parsed.needs_review) || true,
         };
         setScanResults(preview);
       }
@@ -142,8 +173,15 @@ export default function Upload({
       setScanProgress(100);
       setScanComplete(true);
     } catch (error) {
-      console.error("Scanning failed:", error);
-      setScanError(error?.message || "Scanning failed");
+      const serverMsg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        "Scanning failed. Please check your connection and try again.";
+      const sanitizedError =
+        typeof serverMsg === "object" ? JSON.stringify(serverMsg) : String(serverMsg);
+
+      setErrorMessage(sanitizedError);
       setScanComplete(false);
       setScanResults(null);
     } finally {
@@ -156,23 +194,42 @@ export default function Upload({
   };
 
   const handleReset = () => {
-    // Stop progress updates if any
     if (progressTimerRef.current) {
       clearInterval(progressTimerRef.current);
       progressTimerRef.current = null;
     }
     setIsScanning(false);
     setSelectedFile(null);
+    if (filePreviewUrl) {
+      URL.revokeObjectURL(filePreviewUrl);
+      setFilePreviewUrl(null);
+    }
     setScanComplete(false);
     setScanProgress(0);
     setScanResults(null);
-    setScanError("");
-    // Clear parent-level outputs so new upload starts fresh
+    setErrorMessage(null);
+    setIsConfirmed(false);
     setExtracted(null);
     setResult("");
-    // Clear the underlying file input so selecting the same file triggers onChange
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
+    }
+  };
+
+  const handleSavePrescription = async () => {
+    if (scanResults?.needsReview && !isConfirmed) {
+      alert("Please review your prescription details and check the confirmation box before saving.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await api.post("/prescriptions", scanResults);
+      navigate("/prescriptions");
+    } catch (err) {
+      alert("Failed to save prescription: " + (err.response?.data?.message || err.message));
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -185,316 +242,387 @@ export default function Upload({
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-gray-900 text-gray-100 rounded-lg shadow-lg border border-gray-700">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-100 mb-2">
-          Prescription Scanner
-        </h2>
-        <p className="text-gray-400 text-sm">
-          Choose a prescription file to scan and extract information
-        </p>
-      </div>
+    <div className="w-full max-w-5xl mx-auto space-y-8 pb-12">
+      {/* Process Pipeline Status Bar */}
+      <ProcessPipelineBar currentStage={scanComplete ? 4 : isScanning ? 2 : selectedFile ? 1 : 1} />
 
-      {!selectedFile ? (
-        // File Selection Area
-        <div
-          className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 transition-colors duration-200"
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
-          <div className="mb-4">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              stroke="currentColor"
-              fill="none"
-              viewBox="0 0 48 48"
-            >
-              <path
-                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <div className="mb-4">
-            <p className="text-gray-600 mb-2">
-              Drag and drop your prescription here, or
+      {/* Main Studio Card with Subtle Pattern */}
+      <div className="card-snow bg-clinical-pattern relative overflow-hidden">
+        {/* Subtle Ambient Glow */}
+        <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-[#244cff]/5 blur-3xl pointer-events-none" />
+
+        {/* Section Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-[rgba(0,0,0,0.08)] gap-4 relative z-10">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="badge-ice">Prescription Scanner</span>
+            </div>
+            <h2 className="font-['Inter'] text-2xl sm:text-3xl font-normal text-[#000000] tracking-tight">
+              Scan a prescription
+            </h2>
+            <p className="font-['Inter'] text-sm text-[#2b2b2b] mt-1">
+              Upload a clear photo of your prescription to read medicine details and set up reminders.
             </p>
-            <label className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
-              Choose Prescription
-              <input
-                type="file"
-                className="hidden"
-                onChange={handleFileSelect}
-                accept="image/*"
-                ref={fileInputRef}
-              />
-            </label>
-          </div>
-          <p className="text-xs text-gray-500">
-            Support for image files
-          </p>
-        </div>
-      ) : (
-        // File Preview and Scan
-        <div className="space-y-4">
-          {/* File Info */}
-          <div className="bg-gray-800 rounded-lg p-4">
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0">
-                <svg
-                  className="h-8 w-8 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  ></path>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-100 truncate">
-                  {selectedFile.name}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {formatFileSize(selectedFile.size)}
-                </p>
-              </div>
-              <button
-                onClick={handleReset}
-                className="flex-shrink-0 text-gray-400 hover:text-gray-600"
-              >
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
-            </div>
           </div>
 
-          {/* Scan Progress */}
-          {isScanning && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-300">Scanning prescription...</span>
-                <span className="text-gray-900">{scanProgress}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${scanProgress}%` }}
-                ></div>
-              </div>
-            </div>
-          )}
-
-          {/* Scan Error */}
-          {!isScanning && !!scanError && (
-            <div className="bg-red-900 border border-red-700 rounded-lg p-4">
-              <div className="flex items-start">
-                <svg
-                  className="h-5 w-5 text-red-300 mr-2 mt-0.5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  ></path>
-                </svg>
-                <div className="text-sm text-red-100 break-words">
-                  {scanError}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Scan Results */}
-          {scanComplete && scanResults && (
-            <div className="bg-green-900 border border-green-700 rounded-lg p-4">
-              <div className="flex items-center mb-3">
-                <svg
-                  className="h-5 w-5 text-green-600 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  ></path>
-                </svg>
-                <span className="text-green-100 text-sm font-medium">
-                  Prescription scanned successfully!
-                </span>
-              </div>
-
-              {/* Extracted Information */}
-              <div className="space-y-2 text-xs">
-                <div>
-                  <span className="font-medium text-gray-100">Medications:</span>
-                  <ul className="text-gray-200 ml-2">
-                    {(() => {
-                      let meds = scanResults.medications;
-                      if (Array.isArray(meds)) {
-                        return meds.map((med, index) => (
-                          <li key={index} className="text-xs">
-                            • {med.name} - {med.dosage}, {med.frequency}, {med.duration}
-                          </li>
-                        ));
-                      } else if (typeof meds === "object" && meds !== null) {
-                        return (
-                          <li className="text-xs">
-                            • {meds.name} - {meds.dosage}, {meds.frequency}, {meds.duration}
-                          </li>
-                        );
-                      } else {
-                        return (
-                          <li className="text-xs text-gray-400">No medications found</li>
-                        );
-                      }
-                    })()}
-                  </ul>
-                </div>
-              </div>
-  {/* Related Features */}
-              <div className="border-t border-green-700 pt-3 mt-3">
-                <p className="text-xs text-green-200 mb-2 font-semibold">Explore related features:</p>
-                <div className="flex flex-wrap gap-2">
-                  <a
-                    href="/analytics"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded transition-colors inline-block"
-                  >
-                    View Analytics
-                  </a>
-                  <a
-                    href="/advanced-search"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded transition-colors inline-block"
-                  >
-                    Search Similar
-                  </a>
-                  <a
-                    href="/data-insights"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded transition-colors inline-block"
-                  >
-                    View Insights
-                  </a>
-                </div>
-              </div>
-            
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex space-x-3">
-            {!scanComplete ? (
-              <button
-                onClick={handleScan}
-                disabled={isScanning}
-                className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center"
-              >
-                {isScanning ? (
-                  <>
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Scanning...
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      className="h-4 w-4 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      ></path>
-                    </svg>
-                    Scan Prescription
-                  </>
-                )}
-              </button>
-            ) : (
-              <>
-                <button
-                  onClick={async () => {
-                    // Save prescription to backend
-                    try {
-                      await api.post("/prescriptions", scanResults);
-                      // Optionally reset scan and navigate to prescriptions list
-                      handleReset();
-                      window.location.href = "/prescriptions";
-                    } catch (err) {
-                      alert("Failed to save prescription");
-                    }
-                  }}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200"
-                >
-                  Save Prescription
-                </button>
-                <button
-                  onClick={handleReset}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium transition-colors duration-200"
-                >
-                  Scan Another Prescription
-                </button>
-              </>
-            )}
+          {selectedFile && (
             <button
+              type="button"
               onClick={handleReset}
-              className="px-4 py-2 border border-gray-300 text-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+              disabled={isScanning}
+              className="btn-outline-pill text-xs self-start sm:self-auto interactive-pill"
             >
-              Cancel
+              Reset Scanner
+            </button>
+          )}
+        </div>
+
+        {/* Error Alert Box */}
+        {errorMessage && (
+          <div className="my-6 p-4 rounded-[6px] bg-[#fcc2cd]/20 border border-[#fcc2cd] text-[#000000] text-sm flex items-start gap-3 relative z-10">
+            <AlertTriangle className="w-5 h-5 text-[#ff2b3a] shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-semibold text-[#000000]">Extraction Notice</p>
+              <p className="text-xs text-[#2b2b2b] mt-0.5">{errorMessage}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErrorMessage(null)}
+              className="text-[#878787] hover:text-[#000000] cursor-pointer"
+            >
+              <X className="w-4 h-4" />
             </button>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* State 1: Dropzone + Hero Illustration (No File Selected) */}
+        {!selectedFile ? (
+          <div className="pt-8 space-y-8 relative z-10">
+            {/* Split Composition: Dropzone on Left, Floating Vector Artwork on Right */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* Left Column: Dropzone (7 Cols) */}
+              <div className="lg:col-span-7">
+                <div
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed border-[#b0b0b0] hover:border-[#244cff] bg-[#ffffff]/90 hover:bg-[#ffffff] rounded-[14px] p-8 sm:p-10 text-center transition-all duration-300 cursor-pointer group shadow-sm hover:shadow-md"
+                >
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    accept="image/*"
+                    className="hidden"
+                  />
+
+                  <div className="w-16 h-16 rounded-full bg-[#e8f8ff] border border-[rgba(36,76,255,0.2)] group-hover:scale-110 flex items-center justify-center text-[#244cff] mx-auto mb-4 transition-transform duration-300 shadow-xs">
+                    <Scan className="w-7 h-7 text-[#244cff]" />
+                  </div>
+
+                  <h3 className="font-['Inter'] text-lg font-medium text-[#000000] mb-1.5">
+                    Drop your paper prescription here, or click to browse
+                  </h3>
+                  <p className="font-['Inter'] text-xs text-[#878787] mb-6 max-w-sm mx-auto">
+                    Supports clear smartphone photos or clinic document scans (PNG, JPEG, WEBP up to 15MB)
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
+                    className="btn-cobalt text-sm interactive-pill"
+                  >
+                    <UploadIcon className="w-4 h-4 mr-1" />
+                    <span>Select Prescription File</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Column: Custom Animated Prescription Vector Artwork (5 Cols) */}
+              <div className="lg:col-span-5 flex flex-col items-center justify-center">
+                <div className="relative w-full max-w-xs sm:max-w-sm animate-float-slow">
+                  <img
+                    src="/assets/illustrations/prescription-scanning.svg"
+                    alt="Prescription scanning workflow"
+                    className="w-full h-auto drop-shadow-lg"
+                  />
+                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#1d1f21] text-white text-[11px] font-mono rounded-full border border-white/10 flex items-center gap-2 whitespace-nowrap shadow-md">
+                    <span className="w-2 h-2 rounded-full bg-[#00c978] animate-pulse" />
+                    <span>Scanner ready</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Helper Instructions Cards with Rich Medical Icon Vignettes */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+              <div className="p-4 rounded-[8px] bg-[#ffffff] border border-[rgba(0,0,0,0.06)] interactive-card flex items-start gap-3.5">
+                <div className="w-9 h-9 rounded-full bg-[#fced9f]/50 flex items-center justify-center shrink-0 mt-0.5">
+                  <Sun className="w-4.5 h-4.5 text-[#9e770b]" />
+                </div>
+                <div>
+                  <p className="font-semibold text-xs text-[#000000] mb-0.5">1. Adequate Daylight</p>
+                  <p className="text-[12px] text-[#878787] leading-relaxed">
+                    Capture evenly under daylight without shadows across handwritten dosage signs.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-[8px] bg-[#ffffff] border border-[rgba(0,0,0,0.06)] interactive-card flex items-start gap-3.5">
+                <div className="w-9 h-9 rounded-full bg-[#e8f8ff] flex items-center justify-center shrink-0 mt-0.5">
+                  <Building2 className="w-4.5 h-4.5 text-[#244cff]" />
+                </div>
+                <div>
+                  <p className="font-semibold text-xs text-[#000000] mb-0.5">2. Include Clinic Header</p>
+                  <p className="text-[12px] text-[#878787] leading-relaxed">
+                    Ensure clinic letterhead, doctor name, and date are inside the frame.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-[8px] bg-[#ffffff] border border-[rgba(0,0,0,0.06)] interactive-card flex items-start gap-3.5">
+                <div className="w-9 h-9 rounded-full bg-[#c3aeff]/40 flex items-center justify-center shrink-0 mt-0.5">
+                  <Pill className="w-4.5 h-4.5 text-[#294dba]" />
+                </div>
+                <div>
+                  <p className="font-semibold text-xs text-[#000000] mb-0.5">3. Full Medicine Table</p>
+                  <p className="text-[12px] text-[#878787] leading-relaxed">
+                    Verify that dosage quantities (e.g. 500mg) and timings are clearly framed.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* State 2 & 3: File Selected, Scanning, and Extraction Results */
+          <div className="space-y-6 pt-6 relative z-10">
+            {/* File Review Card */}
+            <div className="p-4 rounded-[8px] bg-[#f7f7f1] border border-[rgba(0,0,0,0.08)] flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5 overflow-hidden">
+                {filePreviewUrl ? (
+                  <div className="relative w-16 h-16 rounded-[8px] overflow-hidden border border-[rgba(0,0,0,0.1)] shrink-0 bg-white shadow-xs">
+                    <img
+                      src={filePreviewUrl}
+                      alt="Prescription preview"
+                      className="w-full h-full object-cover"
+                    />
+                    {isScanning && (
+                      <div className="absolute inset-0 bg-[#244cff]/20 animate-pulse pointer-events-none" />
+                    )}
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 rounded-[8px] bg-white border border-[rgba(0,0,0,0.1)] flex items-center justify-center shrink-0 shadow-xs">
+                    <FileText className="w-7 h-7 text-[#244cff]" />
+                  </div>
+                )}
+                <div className="overflow-hidden">
+                  <p className="font-['Inter'] text-sm font-semibold text-[#000000] truncate">
+                    {selectedFile.name}
+                  </p>
+                  <p className="text-xs text-[#878787] mt-0.5 flex items-center gap-2">
+                    <span>{formatFileSize(selectedFile.size)}</span>
+                    <span>•</span>
+                    <span className="text-[#244cff] font-medium">Ready to scan prescription</span>
+                  </p>
+                </div>
+              </div>
+
+              {!isScanning && (
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="p-2 text-[#878787] hover:text-[#ff2b3a] hover:bg-black/5 rounded-full cursor-pointer transition-colors"
+                  title="Remove image"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+
+            {/* Clean Blue Progress Bar matching the light theme */}
+            {isScanning && (
+              <div className="w-full space-y-2 py-3 px-1">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <span className="text-[#244cff]">Scanning prescription...</span>
+                  <span className="text-[#878787] font-mono">{scanProgress}%</span>
+                </div>
+                <div className="w-full bg-[#e8f8ff] rounded-full h-2.5 overflow-hidden border border-[#244cff]/15">
+                  <div
+                    className="bg-[#244cff] h-full rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${scanProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Extraction Results Overview */}
+            {scanComplete && scanResults && (
+              <div className="space-y-6 pt-2">
+                {/* Status Notice Banner */}
+                <div className="p-4 rounded-[8px] bg-[#00c978]/10 border border-[#00c978]/30 flex items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#00c978] flex items-center justify-center text-white shrink-0">
+                      <Check className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-xs text-[#000000]">Prescription Read Successfully</p>
+                      <p className="text-xs text-[#2b2b2b]">
+                        Found {scanResults.medications?.length || 0} medication(s) for {scanResults.patientName}.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="badge-parchment text-xs font-mono">
+                    {scanResults.prescriptionNumber}
+                  </span>
+                </div>
+
+                {/* Metadata Row */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                  <div className="p-3.5 rounded-[8px] bg-[#ffffff] border border-[rgba(0,0,0,0.06)] shadow-xs">
+                    <span className="text-[11px] font-semibold text-[#878787] block">Patient</span>
+                    <span className="font-semibold text-sm text-[#000000] mt-0.5 block truncate">{scanResults.patientName}</span>
+                  </div>
+                  <div className="p-3.5 rounded-[8px] bg-[#ffffff] border border-[rgba(0,0,0,0.06)] shadow-xs">
+                    <span className="text-[11px] font-semibold text-[#878787] block">Doctor</span>
+                    <span className="font-semibold text-sm text-[#000000] mt-0.5 block truncate">{scanResults.doctorName}</span>
+                  </div>
+                  <div className="p-3.5 rounded-[8px] bg-[#ffffff] border border-[rgba(0,0,0,0.06)] shadow-xs">
+                    <span className="text-[11px] font-semibold text-[#878787] block">Date Issued</span>
+                    <span className="font-semibold text-sm text-[#000000] mt-0.5 block">{scanResults.dateIssued}</span>
+                  </div>
+                  <div className="p-3.5 rounded-[8px] bg-[#ffffff] border border-[rgba(0,0,0,0.06)] shadow-xs">
+                    <span className="text-[11px] font-semibold text-[#878787] block">Diagnosis</span>
+                    <span className="font-semibold text-sm text-[#000000] mt-0.5 block truncate">{scanResults.diagnosis}</span>
+                  </div>
+                </div>
+
+                {/* Medications List */}
+                <div className="space-y-3">
+                  <h4 className="font-['Inter'] text-sm font-semibold text-[#000000] tracking-wide">
+                    Extracted Medicines ({scanResults.medications?.length || 0})
+                  </h4>
+                  <div className="space-y-2">
+                    {scanResults.medications?.map((med, idx) => (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-[8px] bg-[#ffffff] border border-[rgba(0,0,0,0.08)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 interactive-card"
+                      >
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#244cff]" />
+                            <span className="font-semibold text-sm text-[#000000]">{med.name}</span>
+                          </div>
+                          <p className="text-xs text-[#878787] mt-1 ml-4.5">
+                            Dose: {med.dosage} • Frequency: {med.frequency} • Course: {med.duration}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 ml-4.5 sm:ml-0">
+                          <span className="badge-ice text-xs">{med.dosage}</span>
+                          <span className="badge-lavender text-xs">{med.frequency}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Patient Review Confirmation Safeguard */}
+                <div className="p-4.5 rounded-[8px] bg-[#ffffbd]/30 border border-[#9e770b]/30 text-xs space-y-2.5">
+                  <div className="flex items-center gap-2 text-[#9e770b] font-semibold">
+                    <ShieldCheck className="w-4 h-4 text-[#9e770b]" />
+                    <span>Please Verify Your Medicines</span>
+                  </div>
+                  <p className="text-[#2b2b2b] leading-relaxed">
+                    Always compare these scanned details against your physical paper prescription slip. If anything looks incorrect or unreadable, edit the details or check with your doctor or pharmacist.
+                  </p>
+                  <label className="flex items-center gap-2.5 pt-2 border-t border-[#9e770b]/20 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      id="confirm-review-checkbox"
+                      checked={isConfirmed}
+                      onChange={(e) => setIsConfirmed(e.target.checked)}
+                      className="cursor-pointer w-4 h-4 text-[#244cff] rounded"
+                    />
+                    <span className="font-medium text-[#000000]">
+                      I have checked these medicines against my original prescription slip.
+                    </span>
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* Actions Bar */}
+            <div className="pt-4 flex flex-col sm:flex-row items-center gap-3">
+              {!scanComplete ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleScan}
+                    disabled={isScanning}
+                    className="btn-cobalt w-full sm:flex-1 disabled:opacity-50 interactive-pill"
+                    style={{ height: "42px" }}
+                  >
+                    {isScanning ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin mr-2" />
+                        <span>Scanning prescription...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        <span>{errorMessage ? "Retry Scanning" : "Scan Prescription"}</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    disabled={isScanning}
+                    className="btn-outline-pill w-full sm:w-auto interactive-pill"
+                    style={{ height: "42px" }}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleSavePrescription}
+                    disabled={!isConfirmed || isSaving}
+                    className="btn-cobalt w-full sm:flex-1 disabled:opacity-50 interactive-pill"
+                    style={{ height: "42px" }}
+                  >
+                    {isSaving ? "Saving to Records..." : "Save Prescription to Records"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigate("/set-reminder", { state: { prefill: scanResults } });
+                    }}
+                    disabled={!isConfirmed}
+                    className="btn-obsidian w-full sm:flex-1 disabled:opacity-50 interactive-pill"
+                    style={{ height: "42px" }}
+                  >
+                    <Calendar className="w-4 h-4 mr-2" />
+                    <span>Configure Reminders</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="btn-outline-pill text-xs interactive-pill"
+                    style={{ height: "42px" }}
+                  >
+                    Scan Another
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

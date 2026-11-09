@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import api from "../api/axios.js";
 import {
   Search,
@@ -14,7 +13,6 @@ import Container from "./container.jsx";
 import StatCard from "./StatCard.jsx";
 
 export default function AdvancedSearch() {
-  const navigate = useNavigate();
   const [filters, setFilters] = useState({
     status: "all",
     dateRange: "all",

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <path d="M 16 4 V 14 M 16 14 L 11 18 M 16 14 L 21 18" stroke="#244cff" stroke-width="2" stroke-linecap="round"/>
+  <!-- Left Lung -->
+  <path d="M 11 18 C 7 19 5 23 6 27 C 7 29 11 30 14 27 C 15 25 15 20 11 18 Z" fill="#e8f8ff" stroke="#244cff" stroke-width="1.5"/>
+  <!-- Right Lung -->
+  <path d="M 21 18 C 25 19 27 23 26 27 C 25 29 21 30 18 27 C 17 25 17 20 21 18 Z" fill="#e8f8ff" stroke="#244cff" stroke-width="1.5"/>
+</svg>

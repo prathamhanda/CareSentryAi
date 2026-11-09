@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Thermometer Body -->
+  <rect x="14" y="5" width="4" height="15" rx="2" fill="#fced9f" stroke="#1d1f21" stroke-width="1.5"/>
+  <!-- Bulb -->
+  <circle cx="16" cy="23" r="5" fill="#ffb800" stroke="#1d1f21" stroke-width="1.5"/>
+  <!-- Mercury Liquid -->
+  <line x1="16" y1="12" x2="16" y2="23" stroke="#ffb800" stroke-width="2" stroke-linecap="round"/>
+  <!-- Fever Heat Radiations -->
+  <path d="M 9 9 Q 7 11 9 13 M 23 9 Q 25 11 23 13" stroke="#ffb800" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

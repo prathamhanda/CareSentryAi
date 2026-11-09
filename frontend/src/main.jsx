@@ -5,8 +5,6 @@ import {
   RouterProvider,
   Navigate,
 } from "react-router-dom";
-import { Provider } from "react-redux";
-import store from "./store/index.js";
 import "./index.css";
 import App from "./App.jsx";
 import LoginPage from "./pages/Login.jsx";
@@ -14,6 +12,7 @@ import RegisterPage from "./pages/Register.jsx";
 import Prescription from "./pages/Prescription.jsx";
 import PrescriptionsPage from "./pages/Prescriptions.jsx";
 import SchedulePage from "./pages/Schedule.jsx";
+import SetReminderPage from "./pages/SetReminderPage.jsx";
 import PredictionPage from "./pages/Prediction.jsx";
 import Analytics from "./pages/Analytics.jsx";
 import AdvancedSearchPage from "./pages/AdvancedSearch.jsx";
@@ -34,11 +33,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: (
-          <RedirectIfAuth>
-            <Landing />
-          </RedirectIfAuth>
-        ),
+        element: <Landing />,
       },
       {
         path: "login",
@@ -65,6 +60,10 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "landing",
+        element: <Landing />,
+      },
+      {
         path: "prediction",
         element: <PredictionPage />,
       },
@@ -73,6 +72,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <SchedulePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "set-reminder",
+        element: (
+          <ProtectedRoute>
+            <SetReminderPage />
           </ProtectedRoute>
         ),
       },
@@ -115,8 +122,6 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <Provider store={store}>
-      <RouterProvider router={router} />
-    </Provider>
+    <RouterProvider router={router} />
   </React.StrictMode>
 );

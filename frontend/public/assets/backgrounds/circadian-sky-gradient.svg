@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1200 400" preserveAspectRatio="none" fill="none">
+  <defs>
+    <linearGradient id="circadianSky" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fff8e7" stop-opacity="0.8"/>
+      <stop offset="35%" stop-color="#e8f8ff" stop-opacity="0.9"/>
+      <stop offset="70%" stop-color="#f0ebff" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#e9edf5" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#circadianSky)"/>
+</svg>

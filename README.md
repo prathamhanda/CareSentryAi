@@ -243,7 +243,7 @@ npm install
 
 #### 2) Environment Variables
 
-Create `./frontend/.env` (or set Vercel env vars):
+Create `./frontend/.env` (or set Cloudflare Pages environment variables):
 
 ```env
 VITE_API_BASE_URL=http://localhost:3000
@@ -255,6 +255,22 @@ VITE_OCR_BASE_URL=http://localhost:5000
 ```bash
 npm run dev
 ```
+
+---
+
+### Cloudflare Pages Deployment
+
+Deploy only the `frontend/` directory to Cloudflare Pages. The backend remains a Node/Express service on Render, and the frontend calls it through `VITE_API_BASE_URL`.
+
+1. In Cloudflare Pages, create a project from this repository and set the root directory to `frontend`.
+2. Use `npm run build` as the build command and `dist` as the output directory.
+3. Set the Pages build environment to Node `22` (or any version satisfying `>=20.19.0`).
+4. Add `VITE_API_BASE_URL` as a production environment variable using the public Render backend URL, without a trailing `/api` (for example, `https://your-backend.onrender.com`).
+5. Add the Cloudflare Pages URL to the Render backend's `CORS_ORIGIN` variable. For a custom domain, include both the `*.pages.dev` URL and custom domain as comma-separated values.
+6. Redeploy the backend after changing `CORS_ORIGIN`, then deploy Pages.
+7. Verify `/health` on the backend, open the Pages URL, refresh nested routes such as `/upload` and `/schedule`, and test login plus one API-backed action.
+
+The frontend includes `public/_redirects`, which preserves React Router routes on Cloudflare Pages refreshes. Do not commit `.env` files; configure secrets in Cloudflare Pages and Render dashboards.
 
 ---
 

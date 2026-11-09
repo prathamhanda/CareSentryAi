@@ -51,21 +51,39 @@ export const getPrescriptionsByDateRange = async (req, res) => {
     const { fromDate, toDate } = req.query;
 
     if (!fromDate || !toDate) {
+      console.error("getPrescriptionsByDateRange: Missing dates", { fromDate, toDate });
       return res
         .status(400)
         .json({
           status: 400,
-          message: "fromDate and toDate are required (ISO format)",
+          message: "fromDate and toDate are required (ISO format YYYY-MM-DD)",
         });
     }
+
+    // Parse dates and ensure we include the entire day for toDate
+    const fromDateTime = new Date(fromDate);
+    fromDateTime.setHours(0, 0, 0, 0); // Start of day
+    
+    const toDateTime = new Date(toDate);
+    toDateTime.setHours(23, 59, 59, 999); // End of day
+
+    console.log("getPrescriptionsByDateRange:", { 
+      userId, 
+      fromDate, 
+      toDate,
+      fromDateTime: fromDateTime.toISOString(),
+      toDateTime: toDateTime.toISOString()
+    });
 
     const prescriptions = await Prescription.find({
       user: userId,
       createdAt: {
-        $gte: new Date(fromDate), // Greater than or equal
-        $lte: new Date(toDate), // Less than or equal
+        $gte: fromDateTime,
+        $lte: toDateTime,
       },
     }).sort({ createdAt: -1 });
+
+    console.log(`Found ${prescriptions.length} prescriptions in date range [${fromDate} to ${toDate}]`);
 
     res.json({
       status: 200,
@@ -73,6 +91,7 @@ export const getPrescriptionsByDateRange = async (req, res) => {
       data: prescriptions,
     });
   } catch (err) {
+    console.error("getPrescriptionsByDateRange Error:", err);
     res.status(500).json({
       status: 500,
       message: "Failed to retrieve prescriptions",
@@ -895,6 +914,77 @@ export const findHighDosageMeds = async (req, res) => {
     res.status(500).json({
       status: 500,
       message: "Failed to find high dosage medications",
+      error: err.message,
+    });
+  }
+};
+
+/**
+ * Advanced filter: Combine status, date range, and medication search
+ * Topics: $and operator combining multiple conditions
+ */
+export const getAdvancedFilteredPrescriptions = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { status, fromDate, toDate, medicationName } = req.query;
+
+    // Build query object dynamically based on provided filters
+    const query = { user: userId };
+
+    // Add status filter if provided
+    if (status && status !== "all") {
+      const statusArray = status
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => ["Active", "Completed", "Expired"].includes(s));
+      
+      if (statusArray.length > 0) {
+        query.status = { $in: statusArray };
+      }
+    }
+
+    // Add date range filter if provided
+    if (fromDate && toDate) {
+      const fromDateTime = new Date(fromDate);
+      fromDateTime.setHours(0, 0, 0, 0); // Start of day
+      
+      const toDateTime = new Date(toDate);
+      toDateTime.setHours(23, 59, 59, 999); // End of day
+
+      query.createdAt = {
+        $gte: fromDateTime,
+        $lte: toDateTime,
+      };
+
+      console.log("getAdvancedFilteredPrescriptions - Date filter:", {
+        fromDate,
+        toDate,
+        fromDateTime: fromDateTime.toISOString(),
+        toDateTime: toDateTime.toISOString(),
+      });
+    }
+
+    // Add medication name filter if provided
+    if (medicationName && medicationName.trim()) {
+      query["medications.name"] = new RegExp(medicationName, "i");
+    }
+
+    console.log("getAdvancedFilteredPrescriptions - Combined query:", query);
+
+    const prescriptions = await Prescription.find(query).sort({ createdAt: -1 });
+
+    console.log(`Found ${prescriptions.length} prescriptions matching all filters`);
+
+    res.json({
+      status: 200,
+      message: `Found ${prescriptions.length} prescriptions matching filters`,
+      data: prescriptions,
+    });
+  } catch (err) {
+    console.error("getAdvancedFilteredPrescriptions Error:", err);
+    res.status(500).json({
+      status: 500,
+      message: "Failed to retrieve prescriptions",
       error: err.message,
     });
   }

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Stomach Contour -->
+  <path d="M 12 7 C 12 5 17 5 17 8 C 17 11 24 12 24 19 C 24 25 18 27 13 25 C 9 23 8 18 10 14 C 11 11 12 9 12 7 Z" fill="#eafbf3" stroke="#00c978" stroke-width="1.8"/>
+  <circle cx="16" cy="18" r="3" fill="#00c978"/>
+</svg>

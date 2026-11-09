@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
+import { User, Mail, Phone, Lock, ArrowRight, ShieldCheck, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -25,9 +26,9 @@ export default function Register() {
     e.preventDefault();
     setError("");
     const payload = {
-      username: formData.username,
-      email: formData.gmail, // backend expects `email`
-      phone: formData.phone,
+      username: formData.username.trim(),
+      email: formData.gmail.trim(),
+      phone: formData.phone.trim(),
       password: formData.password,
     };
     try {
@@ -35,14 +36,13 @@ export default function Register() {
       const res = await api.post("/users/register", payload);
       const data = res?.data || {};
       if (data.status === 201) {
-        // Registration successful -> go to login
         navigate("/login", { replace: true });
       } else {
         setError(data.message || "Registration failed. Please try again.");
       }
     } catch (err) {
       setError(
-        err?.response?.data?.message || err?.message || "Registration failed"
+        err?.response?.data?.message || err?.message || "Registration failed."
       );
     } finally {
       setSubmitting(false);
@@ -50,210 +50,195 @@ export default function Register() {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      {/* Dialog Box Container */}
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto transform transition-all duration-300 ease-in-out max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="px-8 pt-8 pb-6">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Create Account
-            </h2>
-            <p className="text-gray-600 text-sm">
-              Join us today and get started
+    <div className="min-h-[calc(100vh-160px)] flex items-center justify-center py-10 px-4 sm:px-6">
+      <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        {/* Left Column: Visual Companion Showcase (5 Cols) */}
+        <div className="hidden lg:flex lg:col-span-5 flex-col justify-between p-8 rounded-[12px] bg-[#ffffff] border border-[rgba(0,0,0,0.08)] shadow-sm space-y-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#e8f8ff] rounded-full text-xs font-semibold text-[#244cff] mb-4">
+              <span className="w-2 h-2 rounded-full bg-[#244cff]" />
+              <span>Get started</span>
+            </div>
+            <h3 className="font-['Inter'] text-2xl font-normal text-[#000000] tracking-tight">
+              Keep track of your medicines
+            </h3>
+            <p className="font-['Inter'] text-xs text-[#2b2b2b] mt-2 leading-relaxed">
+              Create an account to scan prescriptions, organize your medication schedule, and get reminders when it's time to take your doses.
             </p>
+          </div>
+
+          <div className="w-full flex justify-center py-2 animate-float-slow">
+            <img
+              src="/assets/illustrations/auth-companion.svg"
+              alt="CareSentry companion"
+              className="w-48 h-auto drop-shadow-md"
+            />
+          </div>
+
+          <div className="space-y-2.5 pt-4 border-t border-[rgba(0,0,0,0.06)] text-xs text-[#2b2b2b]">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#00c978]" />
+              <span>Free account with no ads</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#00c978]" />
+              <span>Private and secure data</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#00c978]" />
+              <span>Quick reminder setup with Telegram</span>
+            </div>
           </div>
         </div>
 
-        {/* Form */}
-        <div className="px-8 pb-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-4">
-              {/* Username Field */}
-              <div>
-                <label
-                  htmlFor="username"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Username
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    required
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
-                    placeholder="Choose a username"
-                  />
-                </div>
-              </div>
-
-              {/* Gmail Field */}
-              <div>
-                <label
-                  htmlFor="gmail"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Email Address
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
-                      ></path>
-                    </svg>
-                  </div>
-                  <input
-                    type="email"
-                    id="gmail"
-                    name="gmail"
-                    value={formData.gmail}
-                    onChange={handleChange}
-                    required
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
-                    placeholder="your_email@gmail.com"
-                  />
-                </div>
-              </div>
-
-              {/* Phone Number Field */}
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Phone Number
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    required
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
-                    placeholder="+91xxxxxxxxxx"
-                  />
-                </div>
-              </div>
-
-              {/* Password Field */}
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg
-                      className="h-5 w-5 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
-                    placeholder="Create a strong password"
-                  />
-                </div>
-              </div>
+        {/* Right Column: Registration Card (7 Cols) */}
+        <div className="lg:col-span-7 card-snow bg-clinical-pattern p-8 sm:p-10 space-y-6 shadow-sm">
+          {/* Header */}
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#e8f8ff] rounded-full text-xs font-semibold text-[#244cff] mb-1">
+              <span className="w-2 h-2 rounded-full bg-[#244cff]" />
+              <span>Get started</span>
             </div>
+            <h2 className="font-['Inter'] text-2xl sm:text-3xl font-normal text-[#000000] tracking-tight">
+              Create your account
+            </h2>
+            <p className="font-['Inter'] text-sm text-[#2b2b2b]">
+              Scan prescriptions and set up your daily reminder schedule.
+            </p>
+          </div>
 
-            {/* Submit Button */}
-            {error && (
-              <p className="text-red-600 text-sm" role="alert">
-                {error}
-              </p>
-            )}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-lg"
-            >
-              {submitting ? "Creating Account..." : "Create Account"}
-            </button>
-
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Already have an account?
-                </span>
-              </div>
+          {/* Error Alert */}
+          {error && (
+            <div className="p-3.5 rounded-[6px] bg-[#fcc2cd]/20 border border-[#fcc2cd] text-[#ff2b3a] text-xs flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-[#ff2b3a] shrink-0 mt-0.5" />
+              <span className="font-medium text-[#000000]">{error}</span>
             </div>
+          )}
 
-            {/* Login Link */}
-            <div className="text-center">
-              <Link
-                to="/login"
-                className="text-green-600 hover:text-green-800 font-medium text-sm"
+          {/* Registration Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Username */}
+            <div>
+              <label
+                htmlFor="username"
+                className="block text-xs font-semibold text-[#000000] mb-1.5"
               >
-                Sign in to your account
-              </Link>
+                Username
+              </label>
+              <div className="relative">
+                <User className="w-4 h-4 text-[#878787] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  placeholder="Choose a username"
+                  className="input-mage has-left-icon pl-11"
+                />
+              </div>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="gmail"
+                className="block text-xs font-semibold text-[#000000] mb-1.5"
+              >
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-[#878787] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+                <input
+                  type="email"
+                  id="gmail"
+                  name="gmail"
+                  value={formData.gmail}
+                  onChange={handleChange}
+                  required
+                  placeholder="patient@example.com"
+                  className="input-mage has-left-icon pl-11"
+                />
+              </div>
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label
+                htmlFor="phone"
+                className="block text-xs font-semibold text-[#000000] mb-1.5"
+              >
+                Phone Number
+              </label>
+              <div className="relative">
+                <Phone className="w-4 h-4 text-[#878787] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                  placeholder="+1 (555) 000-0000"
+                  className="input-mage has-left-icon pl-11"
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-xs font-semibold text-[#000000] mb-1.5"
+              >
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-[#878787] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="••••••••••••"
+                  className="input-mage has-left-icon pl-11"
+                />
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full btn-cobalt disabled:opacity-50 interactive-pill"
+                style={{ height: "42px" }}
+              >
+                <span>{submitting ? "Creating Account..." : "Create account"}</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </button>
             </div>
           </form>
+
+          {/* Footer Link & Security Notice */}
+          <div className="pt-4 border-t border-[rgba(0,0,0,0.08)] text-center text-xs text-[#878787] space-y-3">
+            <p>
+              Already registered?{" "}
+              <Link
+                to="/login"
+                className="font-medium text-[#244cff] hover:underline"
+              >
+                Sign in
+              </Link>
+            </p>
+
+            <p className="flex items-center justify-center gap-1.5 text-[11px] text-[#878787] pt-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#00c978]" />
+              <span>Your health information is kept private and secure</span>
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -31,6 +31,8 @@ import {
   // Nested document queries
   searchMedicationByName,
   findHighDosageMeds,
+  // Advanced combined filters
+  getAdvancedFilteredPrescriptions,
 } from "../controllers/advanced-queries.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 
@@ -49,6 +51,7 @@ router.get(
   "/prescriptions/by-status-multiple",
   getPrescriptionsByMultipleStatus
 );
+router.get("/prescriptions/advanced-filter", getAdvancedFilteredPrescriptions);
 router.get("/schedules/exclude-medicines", getSchedulesExcludingMedicines);
 
 // ============================================

@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 380" fill="none" class="prescription-scanning-illustration">
+  <defs>
+    <linearGradient id="scanBeamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#244cff" stop-opacity="0"/>
+      <stop offset="60%" stop-color="#244cff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#244cff" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="sheetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fdfdfb"/>
+    </linearGradient>
+    <filter id="sheetShadow" x="-10%" y="-10%" width="125%" height="130%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#1d1f21" flood-opacity="0.12"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#1d1f21" flood-opacity="0.06"/>
+    </filter>
+    <filter id="laserGlow" x="-20%" y="-50%" width="140%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Orbit Rings -->
+  <g opacity="0.6">
+    <ellipse cx="240" cy="190" rx="200" ry="120" stroke="#244cff" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="4 6"/>
+    <ellipse cx="240" cy="190" rx="150" ry="90" stroke="#1d1f21" stroke-opacity="0.08" stroke-width="1"/>
+  </g>
+
+  <!-- Viewfinder Frame Brackets -->
+  <g stroke="#244cff" stroke-width="2.5" stroke-linecap="round">
+    <!-- Top-Left -->
+    <path d="M 70 80 L 100 80 M 70 80 L 70 110"/>
+    <!-- Top-Right -->
+    <path d="M 410 80 L 380 80 M 410 80 L 410 110"/>
+    <!-- Bottom-Left -->
+    <path d="M 70 300 L 100 300 M 70 300 L 70 270"/>
+    <!-- Bottom-Right -->
+    <path d="M 410 300 L 380 300 M 410 300 L 410 270"/>
+  </g>
+
+  <!-- Under-sheet Shadow Sheet -->
+  <g transform="translate(240, 190) rotate(-3) translate(-240, -190)">
+    <rect x="135" y="65" width="210" height="260" rx="10" fill="#e8f8ff" opacity="0.7"/>
+  </g>
+
+  <!-- Main Prescription Document -->
+  <g id="prescription-sheet" filter="url(#sheetShadow)" transform="translate(240, 190) rotate(1.5) translate(-240, -190)">
+    <rect x="130" y="55" width="220" height="270" rx="10" fill="url(#sheetGrad)" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+
+    <!-- Document Header & Rx Symbol -->
+    <circle cx="160" cy="85" r="14" fill="#e8f8ff"/>
+    <text x="156" y="90" font-family="'Inter', sans-serif" font-weight="800" font-size="12" fill="#244cff">Rx</text>
+    
+    <rect x="184" y="78" width="75" height="6" rx="3" fill="#1d1f21" fill-opacity="0.8"/>
+    <rect x="184" y="89" width="45" height="4" rx="2" fill="#878787" fill-opacity="0.6"/>
+
+    <!-- Clinical Cross Watermark -->
+    <path d="M 235 155 L 245 155 L 245 145 L 255 145 L 255 155 L 265 155 L 265 165 L 255 165 L 255 175 L 245 175 L 245 165 L 235 165 Z" fill="#244cff" fill-opacity="0.04"/>
+
+    <!-- Prescription Lines (Item 1) -->
+    <rect x="155" y="125" width="100" height="5" rx="2.5" fill="#1d1f21" fill-opacity="0.7"/>
+    <rect x="155" y="136" width="60" height="4" rx="2" fill="#878787" fill-opacity="0.5"/>
+    <rect x="290" y="125" width="40" height="15" rx="7.5" fill="#e8f8ff"/>
+    <circle cx="298" cy="132.5" r="3" fill="#244cff"/>
+
+    <!-- Line Divider -->
+    <line x1="155" y1="156" x2="325" y2="156" stroke="rgba(0,0,0,0.06)" stroke-width="1" stroke-dasharray="2 3"/>
+
+    <!-- Prescription Lines (Item 2) -->
+    <rect x="155" y="172" width="115" height="5" rx="2.5" fill="#1d1f21" fill-opacity="0.7"/>
+    <rect x="155" y="183" width="75" height="4" rx="2" fill="#878787" fill-opacity="0.5"/>
+    <rect x="290" y="172" width="40" height="15" rx="7.5" fill="#fced9f"/>
+    <circle cx="298" cy="179.5" r="3" fill="#1d1f21"/>
+
+    <!-- Line Divider -->
+    <line x1="155" y1="203" x2="325" y2="203" stroke="rgba(0,0,0,0.06)" stroke-width="1" stroke-dasharray="2 3"/>
+
+    <!-- Prescription Lines (Item 3) -->
+    <rect x="155" y="219" width="90" height="5" rx="2.5" fill="#1d1f21" fill-opacity="0.7"/>
+    <rect x="155" y="230" width="50" height="4" rx="2" fill="#878787" fill-opacity="0.5"/>
+
+    <!-- Barcode / Footer Stamp -->
+    <g transform="translate(155, 275)" fill="#1d1f21" fill-opacity="0.4">
+      <rect x="0" y="0" width="2" height="18"/>
+      <rect x="5" y="0" width="3" height="18"/>
+      <rect x="11" y="0" width="1.5" height="18"/>
+      <rect x="15" y="0" width="4" height="18"/>
+      <rect x="22" y="0" width="2" height="18"/>
+      <rect x="26" y="0" width="3.5" height="18"/>
+      <rect x="33" y="0" width="1" height="18"/>
+      <rect x="37" y="0" width="3" height="18"/>
+    </g>
+
+    <!-- Physician Signature Stamp -->
+    <path d="M 270 286 Q 285 272 295 288 T 320 282" stroke="#244cff" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+    <line x1="265" y1="294" x2="325" y2="294" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>
+  </g>
+
+  <!-- Animated Optical Laser Scanning Beam -->
+  <g id="scan-laser-group" transform="translate(0, 0)">
+    <!-- Light cone -->
+    <polygon points="120,120 360,120 370,170 110,170" fill="url(#scanBeamGrad)"/>
+    <!-- Laser line -->
+    <line x1="105" y1="170" x2="375" y2="170" stroke="#244cff" stroke-width="3" filter="url(#laserGlow)" stroke-linecap="round"/>
+    <circle cx="105" cy="170" r="4" fill="#244cff"/>
+    <circle cx="375" cy="170" r="4" fill="#244cff"/>
+  </g>
+
+  <!-- Floating Pill Capsule Satellites -->
+  <!-- Top Left Pill -->
+  <g class="floating-pill-1" transform="translate(85, 140) rotate(-25)">
+    <rect x="0" y="0" width="36" height="16" rx="8" fill="#244cff"/>
+    <path d="M 18 0 L 28 0 A 8 8 0 0 1 36 8 A 8 8 0 0 1 28 16 L 18 16 Z" fill="#ffffff"/>
+    <circle cx="9" cy="8" r="2.5" fill="#ffffff" opacity="0.8"/>
+  </g>
+
+  <!-- Bottom Right Blister Capsule -->
+  <g class="floating-pill-2" transform="translate(370, 230) rotate(20)">
+    <rect x="0" y="0" width="40" height="18" rx="9" fill="#1d1f21"/>
+    <path d="M 20 0 L 31 0 A 9 9 0 0 1 40 9 A 9 9 0 0 1 31 18 L 20 18 Z" fill="#00c978"/>
+    <circle cx="30" cy="9" r="2" fill="#ffffff"/>
+  </g>
+
+  <!-- Smart Scanner Chip Badge -->
+  <g class="floating-ocr-badge" transform="translate(290, 60)">
+    <rect x="0" y="0" width="125" height="30" rx="15" fill="#1d1f21" filter="url(#sheetShadow)"/>
+    <circle cx="15" cy="15" r="4" fill="#00c978"/>
+    <text x="26" y="19" font-family="'Inter', sans-serif" font-weight="600" font-size="10.5" fill="#ffffff">Smart Scanner</text>
+  </g>
+</svg>

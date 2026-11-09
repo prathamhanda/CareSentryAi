@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 280" fill="none" class="empty-prescriptions-illustration">
+  <defs>
+    <linearGradient id="folderBack" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8f8ff"/>
+      <stop offset="100%" stop-color="#c3aeff"/>
+    </linearGradient>
+    <filter id="folderShadow" x="-10%" y="-10%" width="125%" height="130%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#1d1f21" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background Document Stack (Tilted Back) -->
+  <g transform="translate(190, 140) rotate(-6) translate(-190, -140)" opacity="0.6">
+    <rect x="100" y="50" width="180" height="150" rx="10" fill="#ffffff" stroke="rgba(0,0,0,0.06)" stroke-width="1.5"/>
+    <rect x="120" y="70" width="80" height="6" rx="3" fill="#1d1f21" fill-opacity="0.2"/>
+    <rect x="120" y="84" width="120" height="4" rx="2" fill="#878787" fill-opacity="0.2"/>
+  </g>
+
+  <!-- Main Clinical Folder (Foreground) -->
+  <g filter="url(#folderShadow)" transform="translate(190, 140) rotate(2) translate(-190, -140)">
+    <!-- Folder Back / Tab -->
+    <path d="M 90 60 L 150 60 L 165 72 L 290 72 A 12 12 0 0 1 302 84 L 302 210 A 12 12 0 0 1 290 222 L 90 222 A 12 12 0 0 1 78 210 L 78 72 A 12 12 0 0 1 90 60 Z" fill="url(#folderBack)" stroke="rgba(0,0,0,0.08)" stroke-width="1.2"/>
+
+    <!-- Inside White Paper -->
+    <rect x="95" y="76" width="190" height="130" rx="8" fill="#ffffff" stroke="rgba(0,0,0,0.05)" stroke-width="1"/>
+
+    <!-- Clinic Letterhead & Rx -->
+    <circle cx="120" cy="98" r="10" fill="#e8f8ff"/>
+    <text x="116.5" y="102" font-family="'Inter', sans-serif" font-weight="800" font-size="9" fill="#244cff">Rx</text>
+    <rect x="138" y="93" width="70" height="5" rx="2.5" fill="#1d1f21" fill-opacity="0.8"/>
+    <rect x="138" y="102" width="40" height="3" rx="1.5" fill="#878787" fill-opacity="0.5"/>
+
+    <!-- Dosage Lines -->
+    <rect x="110" y="125" width="110" height="4" rx="2" fill="#1d1f21" fill-opacity="0.3"/>
+    <rect x="110" y="137" width="85" height="4" rx="2" fill="#878787" fill-opacity="0.2"/>
+    <rect x="110" y="149" width="130" height="4" rx="2" fill="#878787" fill-opacity="0.2"/>
+
+    <!-- Verification Checkmark Stamp -->
+    <g transform="translate(235, 150)">
+      <circle cx="18" cy="18" r="18" fill="#00c978"/>
+      <path d="M 12 18 L 16 22 L 25 13" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- Floating Pill Capsule -->
+  <g class="empty-pill" transform="translate(280, 75) rotate(-30)">
+    <rect x="0" y="0" width="34" height="14" rx="7" fill="#244cff"/>
+    <path d="M 17 0 L 27 0 A 7 7 0 0 1 34 7 A 7 7 0 0 1 27 14 L 17 14 Z" fill="#ffffff"/>
+  </g>
+
+  <!-- Empty Portfolio Label Pill -->
+  <g transform="translate(130, 230)">
+    <rect x="0" y="0" width="120" height="26" rx="13" fill="#1d1f21"/>
+    <circle cx="13" cy="13" r="3.5" fill="#fced9f"/>
+    <text x="24" y="16.5" font-family="'Inter', sans-serif" font-weight="600" font-size="9.5" fill="#ffffff">Awaiting First Scan</text>
+  </g>
+</svg>

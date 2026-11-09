@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Skin Layer Shield -->
+  <path d="M 16 5 L 25 9 V 17 C 25 22 21 26 16 27 C 11 26 7 22 7 17 V 9 L 16 5 Z" fill="#ffffff" stroke="#1d1f21" stroke-width="1.6"/>
+  <!-- Dermal layers -->
+  <path d="M 11 14 Q 16 12 21 14" stroke="#244cff" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 11 18 Q 16 16 21 18" stroke="#ffb800" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

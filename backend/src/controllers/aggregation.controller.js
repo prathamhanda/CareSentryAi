@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { Prescription } from "../models/prescription.model.js";
+import { Schedule } from "../models/schedule.model.js";
 
 // ============================================
 // AGGREGATION FRAMEWORK EXAMPLES
@@ -12,21 +14,34 @@ export const getMedicationStatistics = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user._id);
 
-    const stats = await mongoose.model("Prescription").aggregate([
-      // Stage 1: Match only this user's prescriptions
+    const stats = await Prescription.aggregate([
       {
         $match: { user: userId },
       },
-      // Stage 2: Unwind medications array to process each medication separately
       {
         $unwind: "$medications",
       },
-      // Stage 3: Group by medication name and calculate statistics
       {
         $group: {
           _id: "$medications.name", // Group by medication name
           totalOccurrences: { $sum: 1 }, // Count occurrences - $sum
-          averageDosage: { $avg: { $toInt: "$medications.dosage" } }, // $avg
+          // Use $convert for safer type conversion
+          averageDosage: { 
+            $avg: {
+              $cond: [
+                { $isNumber: "$medications.dosage" },
+                "$medications.dosage",
+                {
+                  $convert: {
+                    input: "$medications.dosage",
+                    to: "int",
+                    onError: 0,
+                    onNull: 0
+                  }
+                }
+              ]
+            }
+          },
           uniqueFrequencies: { $addToSet: "$medications.frequency" }, // $addToSet
           prescriptionIds: { $push: "$_id" }, // $push accumulator
           lastUsed: { $max: "$updatedAt" }, // $max
@@ -45,6 +60,7 @@ export const getMedicationStatistics = async (req, res) => {
       data: stats,
     });
   } catch (err) {
+    console.error("getMedicationStatistics Error:", err);
     res.status(500).json({
       status: 500,
       message: "Failed to retrieve medication statistics",
@@ -61,7 +77,7 @@ export const getPrescriptionDashboard = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user._id);
 
-    const dashboard = await mongoose.model("Prescription").aggregate([
+    const dashboard = await Prescription.aggregate([
       {
         $match: { user: userId },
       },
@@ -143,6 +159,7 @@ export const getPrescriptionDashboard = async (req, res) => {
       data: dashboard[0], // facet returns array with single object
     });
   } catch (err) {
+    console.error("getPrescriptionDashboard Error:", err);
     res.status(500).json({
       status: 500,
       message: "Failed to retrieve dashboard",
@@ -159,7 +176,7 @@ export const getPrescriptionsWithUserDetails = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user._id);
 
-    const prescriptions = await mongoose.model("Prescription").aggregate([
+    const prescriptions = await Prescription.aggregate([
       {
         $match: { user: userId },
       },
@@ -172,11 +189,9 @@ export const getPrescriptionsWithUserDetails = async (req, res) => {
           as: "userDetails", // Output field name
         },
       },
-      // Stage 3: Convert userDetails array to single object
       {
         $unwind: "$userDetails",
       },
-      // Stage 4: Project only needed fields
       {
         $project: {
           _id: 1,
@@ -217,7 +232,7 @@ export const getPrescriptionsByMedicationBucket = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user._id);
 
-    const buckets = await mongoose.model("Prescription").aggregate([
+    const buckets = await Prescription.aggregate([
       {
         $match: { user: userId },
       },
@@ -267,7 +282,7 @@ export const getActiveScheduleStats = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user._id);
 
-    const stats = await mongoose.model("Schedule").aggregate([
+    const stats = await Schedule.aggregate([
       // Stage 1: Filter only active schedules
       {
         $match: { user: userId, active: true },
@@ -312,7 +327,7 @@ export const exportPrescriptionSummary = async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.user._id);
 
     // Note: This modifies the database by creating a new collection
-    const result = await mongoose.model("Prescription").aggregate([
+    const result = await Prescription.aggregate([
       {
         $match: { user: userId },
       },
@@ -357,7 +372,7 @@ export const getPrescriptionsWithPagination = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const prescriptions = await mongoose.model("Prescription").aggregate([
+    const prescriptions = await Prescription.aggregate([
       {
         $match: { user: userId },
       },
@@ -416,7 +431,7 @@ export const searchMedicationsFullText = async (req, res) => {
         });
     }
 
-    const results = await mongoose.model("Prescription").aggregate([
+    const results = await Prescription.aggregate([
       {
         $match: {
           user: userId,

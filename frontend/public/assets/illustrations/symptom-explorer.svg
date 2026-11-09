@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 360" fill="none" class="symptom-explorer-illustration">
+  <defs>
+    <radialGradient id="meshCenter" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#244cff" stop-opacity="0.15"/>
+      <stop offset="70%" stop-color="#244cff" stop-opacity="0.03"/>
+      <stop offset="100%" stop-color="#244cff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glowLight" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadowChip" x="-10%" y="-10%" width="125%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#1d1f21" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Central Radial Glow -->
+  <circle cx="230" cy="180" r="160" fill="url(#meshCenter)"/>
+
+  <!-- Neural Triage Network Arcs -->
+  <g stroke="#244cff" stroke-opacity="0.2" stroke-width="1.5" stroke-dasharray="3 4">
+    <line x1="230" y1="180" x2="105" y2="98"/>
+    <line x1="230" y1="180" x2="355" y2="98"/>
+    <line x1="230" y1="180" x2="95" y2="250"/>
+    <line x1="230" y1="180" x2="365" y2="250"/>
+    <line x1="230" y1="180" x2="230" y2="58"/>
+  </g>
+
+  <!-- Central Diagnostic Core (AI Stethoscope Cross) -->
+  <g class="central-core" transform="translate(230, 180)" filter="url(#shadowChip)">
+    <circle cx="0" cy="0" r="38" fill="#ffffff" stroke="#244cff" stroke-width="2"/>
+    <circle cx="0" cy="0" r="28" fill="#244cff"/>
+    <!-- Medical Cross -->
+    <path d="M -5 -12 L 5 -12 L 5 -5 L 12 -5 L 12 5 L 5 5 L 5 12 L -5 12 L -5 5 L -12 5 L -12 -5 L -5 -5 Z" fill="#ffffff"/>
+    <circle cx="0" cy="0" r="38" stroke="#244cff" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="4 6"/>
+  </g>
+
+  <!-- System Node 1: Neurological / Brain (Top 230, 58) -->
+  <g class="node-neuro" transform="translate(230, 58)" filter="url(#shadowChip)">
+    <rect x="-68" y="-18" width="136" height="36" rx="18" fill="#c3aeff"/>
+    <circle cx="-48" cy="0" r="10" fill="#1d1f21"/>
+    <!-- Brain node icon -->
+    <path d="M -51 -3 Q -48 -7 -45 -3 Q -42 1 -48 4" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+    <text x="-30" y="3.5" font-family="'Inter', sans-serif" font-weight="700" font-size="10" fill="#1d1f21">Neurological</text>
+  </g>
+
+  <!-- System Node 2: Respiratory / Lungs (Top Left 105, 98) -->
+  <g class="node-respiratory" transform="translate(105, 98)" filter="url(#shadowChip)">
+    <rect x="-65" y="-18" width="130" height="36" rx="18" fill="#e8f8ff" stroke="#244cff" stroke-width="1.2"/>
+    <circle cx="-45" cy="0" r="10" fill="#244cff"/>
+    <!-- Lungs icon -->
+    <path d="M -49 -3 C -49 -5 -45 -5 -45 -3 L -45 3 C -45 5 -49 5 -49 3 Z M -41 -3 C -41 -5 -45 -5 -45 -3 L -45 3 C -45 5 -41 5 -41 3 Z" fill="#ffffff"/>
+    <text x="-27" y="3.5" font-family="'Inter', sans-serif" font-weight="700" font-size="10" fill="#244cff">Respiratory</text>
+  </g>
+
+  <!-- System Node 3: Systemic / Fever (Top Right 355, 98) -->
+  <g class="node-systemic" transform="translate(355, 98)" filter="url(#shadowChip)">
+    <rect x="-72" y="-18" width="144" height="36" rx="18" fill="#fced9f"/>
+    <circle cx="-52" cy="0" r="10" fill="#1d1f21"/>
+    <!-- Thermometer icon -->
+    <path d="M -53 -5 L -51 -5 L -51 0 A 3 3 0 1 1 -53 0 Z" fill="#ffb800"/>
+    <text x="-34" y="3.5" font-family="'Inter', sans-serif" font-weight="700" font-size="10" fill="#1d1f21">Systemic/Fever</text>
+  </g>
+
+  <!-- System Node 4: Gastrointestinal (Bottom Left 95, 250) -->
+  <g class="node-gastro" transform="translate(95, 250)" filter="url(#shadowChip)">
+    <rect x="-81" y="-18" width="162" height="36" rx="18" fill="#ffffff" stroke="#00c978" stroke-width="1.5"/>
+    <circle cx="-60" cy="0" r="10" fill="#00c978"/>
+    <!-- Shield / gut dot -->
+    <circle cx="-60" cy="0" r="4" fill="#ffffff"/>
+    <text x="-42" y="3.5" font-family="'Inter', sans-serif" font-weight="700" font-size="10" fill="#1d1f21">Gastrointestinal</text>
+  </g>
+
+  <!-- System Node 5: Dermatological (Bottom Right 365, 250) -->
+  <g class="node-derm" transform="translate(365, 250)" filter="url(#shadowChip)">
+    <rect x="-76" y="-18" width="152" height="36" rx="18" fill="#ffffff" stroke="#1d1f21" stroke-width="1.2"/>
+    <circle cx="-56" cy="0" r="10" fill="#1d1f21"/>
+    <!-- Derm layer icon -->
+    <path d="M -60 -2 L -56 2 L -52 -2" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+    <text x="-38" y="3.5" font-family="'Inter', sans-serif" font-weight="700" font-size="10" fill="#1d1f21">Dermatological</text>
+  </g>
+
+  <!-- Symptom Checker Banner at Bottom -->
+  <g transform="translate(162, 312)" filter="url(#shadowChip)">
+    <rect x="0" y="0" width="136" height="28" rx="14" fill="#1d1f21"/>
+    <circle cx="16" cy="14" r="3" fill="#00c978"/>
+    <text x="28" y="17.5" font-family="'Inter', sans-serif" font-weight="600" font-size="10" fill="#ffffff">Symptom Checker</text>
+  </g>
+</svg>

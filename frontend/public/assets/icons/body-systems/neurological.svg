@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Brain Profile -->
+  <path d="M 16 6 C 12 6 8 9 9 14 C 7 16 7 20 10 22 C 11 25 14 26 16 26 C 18 26 21 25 22 22 C 25 20 25 16 23 14 C 24 9 20 6 16 6 Z" fill="#c3aeff" stroke="#1d1f21" stroke-width="1.5"/>
+  <path d="M 16 6 V 26" stroke="#1d1f21" stroke-width="1.2" stroke-dasharray="2 2"/>
+  <!-- Synapse Node -->
+  <circle cx="16" cy="15" r="3" fill="#ffffff" stroke="#1d1f21" stroke-width="1.2"/>
+</svg>

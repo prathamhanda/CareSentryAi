@@ -1,1 +1,578 @@
 @import "tailwindcss";
+@import "./tokens.css";
+@import "./base.css" layer(base);
+
+@theme {
+  /* Colors from ui/theme.css and ui/variables.css */
+  --color-electric-cobalt: #244cff;
+  --color-lavender-mist: #c3aeff;
+  --color-parchment: #f7f7f1;
+  --color-snow: #ffffff;
+  --color-ice-wash: #e8f8ff;
+  --color-sky-tint: #d6f2ff;
+  --color-lemon-wash: #ffffbd;
+  --color-blush: #fcc2cd;
+  --color-buttercream: #fced9f;
+  --color-azure: #3388ff;
+  --color-slate-blue: #5487a1;
+  --color-amber: #9e770b;
+  --color-lilac-pop: #ba9ffc;
+  --color-deep-cobalt: #294dba;
+  --color-pure-black: #000000;
+  --color-graphite: #2b2b2b;
+  --color-obsidian: #1d1f21;
+  --color-ash: #878787;
+  --color-fog: #b0b0b0;
+
+  /* Typography */
+  --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Radii */
+  --radius-md: 6px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 100px;
+}
+
+:root {
+  /* Base Colors */
+  --color-electric-cobalt: #244cff;
+  --color-lavender-mist: #c3aeff;
+  --color-parchment: #f7f7f1;
+  --color-snow: #ffffff;
+  --color-ice-wash: #e8f8ff;
+  --color-sky-tint: #d6f2ff;
+  --color-lemon-wash: #ffffbd;
+  --color-blush: #fcc2cd;
+  --color-buttercream: #fced9f;
+  --color-azure: #3388ff;
+  --color-slate-blue: #5487a1;
+  --color-amber: #9e770b;
+  --color-lilac-pop: #ba9ffc;
+  --color-deep-cobalt: #294dba;
+  --color-pure-black: #000000;
+  --color-graphite: #2b2b2b;
+  --color-obsidian: #1d1f21;
+  --color-ash: #878787;
+  --color-fog: #b0b0b0;
+
+  /* Named Radii */
+  --radius-cards: 6px;
+  --radius-images: 16px;
+  --radius-buttons: 100px;
+  --radius-largesurfaces: 12px;
+
+  /* Layout */
+  --page-max-width: 1200px;
+  --section-gap: 64px;
+}
+
+/* ==============================================================================
+   Core Document & Typography Reset
+   ============================================================================== */
+html {
+  background-color: #f7f7f1;
+  color: #000000;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  scroll-behavior: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body {
+  margin: 0;
+  background-color: #f7f7f1;
+  color: #000000;
+  min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* ==============================================================================
+   Mage / Dayos Signature Component Classes
+   ============================================================================== */
+
+@layer components {
+  /* Primary Action CTA — Electric Cobalt (#244cff), 100px Pill Radius */
+  .btn-cobalt {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 100px;
+    background-color: #244cff;
+    color: #ffffff;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    padding: 0 22px;
+    height: 40px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .btn-cobalt:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+  }
+
+  .btn-cobalt:active {
+    transform: translateY(0);
+  }
+
+  /* Dark Action CTA — Obsidian (#1d1f21), 100px Pill Radius */
+  .btn-obsidian {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 100px;
+    background-color: #1d1f21;
+    color: #ffffff;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    padding: 0 20px;
+    height: 40px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .btn-obsidian:hover {
+    background-color: #2b2b2b;
+    transform: translateY(-1px);
+  }
+
+  .btn-obsidian:active {
+    transform: translateY(0);
+  }
+
+  /* Outline Pill Button — White surface, subtle border, 100px Radius */
+  .btn-outline-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 100px;
+    background-color: #ffffff;
+    color: #2b2b2b;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    padding: 0 18px;
+    height: 38px;
+    border: 1px solid #b0b0b0;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .btn-outline-pill:hover {
+    border-color: #000000;
+    color: #000000;
+  }
+
+  /* Ghost Text Link — Graphite (#2b2b2b) */
+  .btn-ghost-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    color: #2b2b2b;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 6px 10px;
+    transition: color 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .btn-ghost-link:hover {
+    color: #000000;
+    text-decoration: underline;
+  }
+}
+
+/* Scrollbar suppression utility for horizontal touch carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Dual Capsule Control — As seen in Mage hero */
+.dual-capsule-wrapper {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 100px;
+  background-color: #244cff;
+  padding: 3px;
+  border: 1px solid #244cff;
+}
+
+.dual-capsule-btn-white {
+  background-color: #ffffff;
+  color: #000000;
+  border-radius: 100px;
+  padding: 8px 18px;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.dual-capsule-btn-white:hover {
+  opacity: 0.9;
+}
+
+/* Card Surfaces */
+/* Snow Card — Level 1 Elevated Surface */
+.card-snow {
+  background-color: #ffffff;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 24px 32px;
+  transition: border-color 0.15s ease;
+}
+
+/* Ice Wash Card — Level 2 Tinted Feature Callout */
+.card-ice {
+  background-color: #e8f8ff;
+  border-radius: 6px;
+  border: 1px solid rgba(36, 76, 255, 0.12);
+  padding: 24px 32px;
+}
+
+/* Obsidian Card — Level 3 Dark-mode Product Island */
+.card-obsidian {
+  background-color: #1d1f21;
+  color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 24px 32px;
+}
+
+/* Form Controls — Clean Editorial Inputs with Solid Opaque Surfaces */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="file"]):not([type="color"]):not([type="image"]),
+textarea,
+select,
+.input-mage {
+  width: 100%;
+  border-radius: 6px;
+  background-color: #ffffff !important;
+  color: #000000;
+  border: 1px solid #b0b0b0;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: "Inter", sans-serif;
+  outline: none;
+  position: relative;
+  z-index: 1;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="file"]):not([type="color"]):not([type="image"]):focus,
+textarea:focus,
+select:focus,
+.input-mage:focus {
+  background-color: #ffffff !important;
+  border-color: #244cff !important;
+  box-shadow: 0 0 0 2px rgba(36, 76, 255, 0.18) !important;
+  outline: none !important;
+  z-index: 2;
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled,
+.input-mage:disabled,
+input:read-only:not([type="checkbox"]):not([type="radio"]),
+.input-mage:read-only {
+  background-color: #f7f7f1 !important;
+  color: #878787;
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+.input-error,
+.input-mage.error,
+.input-mage.is-invalid {
+  border-color: #ff2b3a !important;
+  box-shadow: 0 0 0 2px rgba(255, 43, 58, 0.15) !important;
+}
+
+input::placeholder,
+textarea::placeholder,
+.input-mage::placeholder {
+  color: #878787;
+  opacity: 1;
+}
+
+/* Icon positioning & left padding protection */
+.relative > svg.absolute:first-child,
+.relative > svg:first-child.absolute {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 10;
+  color: #878787;
+}
+
+.relative > svg.absolute:first-child + input,
+.relative > svg.absolute:first-child + .input-mage,
+.relative > svg:first-child.absolute + input,
+.input-mage.has-left-icon,
+.has-left-icon,
+.input-mage.pl-10,
+input.pl-10,
+.input-mage[class*="pl-10"],
+input[class*="pl-10"],
+.input-mage[class*="pl-11"],
+input[class*="pl-11"] {
+  padding-left: 44px !important;
+}
+
+.relative > svg.absolute.right-3,
+.relative > svg.absolute[class*="right-"] {
+  right: 14px;
+  left: auto;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.input-mage.has-right-icon,
+.has-right-icon,
+.input-mage.pr-10,
+input.pr-10,
+.input-mage[class*="pr-10"] {
+  padding-right: 44px !important;
+}
+
+/* Status & Category Badges */
+.badge-cobalt {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #244cff;
+  color: #ffffff;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-lavender {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #c3aeff;
+  color: #1d1f21;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-parchment {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #ffffff;
+  color: #2b2b2b;
+  border: 1px solid #b0b0b0;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 10px;
+}
+
+.badge-ice {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #e8f8ff;
+  color: #244cff;
+  border: 1px solid rgba(36, 76, 255, 0.2);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+}
+
+/* ==============================================================================
+   Background Composition Patterns
+   ============================================================================== */
+.bg-clinical-pattern {
+  background-image: url('/assets/backgrounds/clinical-cross-pattern.svg');
+  background-repeat: repeat;
+}
+
+.bg-scanner-grid {
+  background-color: #1d1f21;
+  background-image: url('/assets/backgrounds/scanner-dark-mesh.svg');
+  background-repeat: repeat;
+}
+
+.bg-circadian-sky {
+  background: linear-gradient(180deg, #fff9ed 0%, #f0f7ff 50%, #f7f7f1 100%);
+}
+
+.bg-hero-radial {
+  background: radial-gradient(circle at 50% 30%, rgba(36, 76, 255, 0.08) 0%, rgba(247, 247, 241, 0) 70%);
+}
+
+/* ==============================================================================
+   Interactive Micro-Interactions & Hover Polish
+   ============================================================================== */
+.interactive-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.25s ease, 
+              border-color 0.25s ease;
+}
+
+.interactive-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px -8px rgba(0, 0, 0, 0.09), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+  border-color: rgba(36, 76, 255, 0.28);
+}
+
+.interactive-pill {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.15s ease,
+              border-color 0.15s ease,
+              box-shadow 0.2s ease;
+}
+
+.interactive-pill:hover {
+  transform: translateY(-1.5px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(36, 76, 255, 0.15);
+}
+
+.interactive-pill:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ==============================================================================
+   Keyframe Animations
+   ============================================================================== */
+@keyframes floatGently {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float-slow {
+  animation: floatGently 5s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: floatGently 6s ease-in-out 1.5s infinite;
+}
+
+@keyframes scanLaserSweep {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: 96%;
+    opacity: 0;
+  }
+}
+
+.animate-scan-laser {
+  animation: scanLaserSweep 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes pulseSubtleGlow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseSubtleGlow 3s ease-in-out infinite;
+}
+
+@keyframes radarExpand {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.animate-radar-ring {
+  animation: radarExpand 2.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ==============================================================================
+   Organic 3D Halftone Wave Mesh Ambient Animation
+   ============================================================================== */
+@keyframes halftoneWaveDrift {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-10px, -6px, 0) scale(1.018);
+  }
+}
+
+.halftone-wave-drift {
+  animation: halftoneWaveDrift 22s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

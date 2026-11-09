@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import api from "../api/axios.js"
-
-const AuthContext=createContext()
+import { AuthContext } from "./AuthContextInstance.jsx";
 
 export function AuthProvider({children}){
     const [user,setUser]=useState(null)
@@ -10,10 +9,11 @@ export function AuthProvider({children}){
     const logout=async()=>{
         try{
             await api.post('/users/logout')
-            setUser(null)
-        }catch(_e){
-            setUser(null)
+        }catch(e){
+            console.warn("Logout request failed:", e?.message)
         }
+        localStorage.removeItem("accessToken")
+        setUser(null)
     }
 
     useEffect(()=>{
@@ -29,5 +29,3 @@ export function AuthProvider({children}){
         </AuthContext.Provider>
     )
 }
-
-export const useAuth=()=>useContext(AuthContext)

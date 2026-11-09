@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
 import { BarChart3, TrendingUp, Pill, Clock } from "lucide-react";
 import StatCard from "./StatCard.jsx";
@@ -7,7 +6,6 @@ import PageWrapper from "./PageWrapper.jsx";
 import Container from "./container.jsx";
 
 export default function PrescriptionStats() {
-  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import api from "../api/axios.js";
 import { BarChart3, Users, TrendingUp, Share2 } from "lucide-react";
 import PageWrapper from "../components/PageWrapper";
@@ -7,7 +6,6 @@ import Container from "../components/container.jsx";
 import StatCard from "../components/StatCard.jsx";
 
 export default function DataInsights() {
-  const navigate = useNavigate();
   const [data, setData] = useState({
     withUser: [],
     paginated: { total: 0, pages: 0, data: [] },
